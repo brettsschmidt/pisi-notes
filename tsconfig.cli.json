@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "jsx": "preserve"
+  },
+  "include": ["src/cli/**/*.ts", "lib/tags.ts", "lib/tasks-md.ts", "lib/slug.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist", ".next"]
+}
