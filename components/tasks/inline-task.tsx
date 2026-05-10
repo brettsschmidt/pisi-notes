@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Check } from "lucide-react";
 import { toggleTask } from "@/lib/actions/tasks";
+import { speak } from "@/lib/mascot/bus";
 import { cn } from "@/lib/utils";
 
 interface InlineTaskProps {
@@ -18,6 +19,7 @@ export function InlineTask({ id, text, done }: InlineTaskProps) {
   function onToggle() {
     const next = !optimistic;
     setOptimistic(next);
+    speak(next ? "taskDone" : "taskUndone");
     startTransition(async () => {
       try {
         await toggleTask(id, next);

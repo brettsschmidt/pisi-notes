@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toggleTask } from "@/lib/actions/tasks";
 import { CompletionNoteModal } from "./completion-note-modal";
+import { speak } from "@/lib/mascot/bus";
 import type { TaskRow as TaskRowData } from "@/lib/queries/tasks";
 
 interface TaskRowProps {
@@ -21,6 +22,7 @@ export function TaskRow({ task, prefill }: TaskRowProps) {
   function onToggle() {
     const next = !optimistic;
     setOptimistic(next);
+    speak(next ? "taskDone" : "taskUndone");
     startTransition(async () => {
       try {
         await toggleTask(task.id, next);

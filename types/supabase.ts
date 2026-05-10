@@ -5,10 +5,11 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-  public: {
+  pisi: {
     Tables: {
       notes: {
         Row: {
+          archived_at: string | null;
           content_md: string;
           created_at: string;
           id: string;
@@ -17,6 +18,7 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          archived_at?: string | null;
           content_md: string;
           created_at?: string;
           id?: string;
@@ -25,6 +27,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          archived_at?: string | null;
           content_md?: string;
           created_at?: string;
           id?: string;

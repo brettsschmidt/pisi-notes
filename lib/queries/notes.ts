@@ -7,6 +7,7 @@ export interface NoteRow {
   tags: string[];
   created_at: string;
   updated_at: string;
+  archived_at: string | null;
 }
 
 export interface NoteFilters {
@@ -20,9 +21,17 @@ export async function getRecentNotes(filters: NoteFilters = {}): Promise<NoteRow
   const limit = filters.limit ?? 200;
   let q = supabase
     .from("notes")
-    .select("id, content_md, tags, created_at, updated_at")
+    .select("id, content_md, tags, created_at, updated_at, archived_at")
     .order("created_at", { ascending: false })
     .limit(limit);
+
+  // Archive rules: archived notes show in the default timeline (visibly
+  // flagged) but are excluded once the user starts filtering — they don't
+  // match tag filters (their tags were stripped on archive) or text search.
+  const filtering = (filters.tags && filters.tags.length > 0) || !!filters.search?.trim();
+  if (filtering) {
+    q = q.is("archived_at", null);
+  }
 
   if (filters.tags && filters.tags.length > 0) {
     q = q.contains("tags", filters.tags);
@@ -43,7 +52,8 @@ export async function getTagCounts(): Promise<{ tag: string; count: number }[]> 
   if (!user) return [];
   // Pull raw rows and aggregate client-side; this avoids needing a custom RPC
   // and the row count per user is bounded by the user's notes (small).
-  const { data, error } = await supabase.from("notes").select("tags");
+  // Archived notes are excluded from tag counts (their tags are also stripped).
+  const { data, error } = await supabase.from("notes").select("tags").is("archived_at", null);
   if (error) throw error;
   const counts = new Map<string, number>();
   for (const row of data ?? []) {

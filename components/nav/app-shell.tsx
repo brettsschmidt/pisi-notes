@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { signOut } from "@/lib/actions/auth";
 
 interface AppShellProps {
@@ -17,11 +18,14 @@ export function AppShell({ sidebar, topbar, children }: AppShellProps) {
           pisi-notes
         </Link>
         <div className="flex flex-1 items-center justify-center gap-2 px-4">{topbar}</div>
-        <form action={signOut}>
-          <Button type="submit" variant="ghost" size="sm" aria-label="sign out">
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </form>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <form action={signOut}>
+            <Button type="submit" variant="ghost" size="sm" aria-label="sign out">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
       </header>
       <div className="flex min-h-0 flex-1">
         {sidebar}

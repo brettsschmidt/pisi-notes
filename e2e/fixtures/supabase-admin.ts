@@ -15,7 +15,8 @@ export function adminClient() {
         "Set SUPABASE_SERVICE_ROLE_KEY in .env.local (or export it) to run them.",
     );
   }
-  return createClient<Database>(url, key, {
+  return createClient<Database, "pisi">(url, key, {
+    db: { schema: "pisi" },
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

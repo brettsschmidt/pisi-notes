@@ -40,6 +40,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
               id={n.id}
               content_md={n.content_md}
               created_at={n.created_at}
+              archived_at={n.archived_at}
               tasks={tasksByNote.get(n.id) ?? []}
             />
           ))

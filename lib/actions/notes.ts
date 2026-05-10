@@ -105,3 +105,29 @@ export async function deleteNote(id: string) {
   revalidatePath("/notes");
   revalidatePath("/tasks");
 }
+
+export async function archiveNote(id: string) {
+  const { supabase, user } = await requireUser();
+  // Strip tags on archive: the note keeps appearing in the timeline but
+  // disappears from the tag sidebar / tag filter / search.
+  const { error } = await supabase
+    .from("notes")
+    .update({ archived_at: new Date().toISOString(), tags: [] })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}
+
+export async function unarchiveNote(id: string) {
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase
+    .from("notes")
+    .update({ archived_at: null })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}

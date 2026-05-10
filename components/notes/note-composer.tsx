@@ -5,6 +5,7 @@ import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TiptapEditor, type TiptapHandle } from "@/components/editor/tiptap-editor";
 import { createNote } from "@/lib/actions/notes";
+import { speak } from "@/lib/mascot/bus";
 
 interface NoteComposerProps {
   onCreated?: () => void;
@@ -22,6 +23,10 @@ export function NoteComposer({ onCreated }: NoteComposerProps) {
     startTransition(async () => {
       try {
         await createNote(text);
+        const hasTask = /\[[ xX]\]/.test(text);
+        const long = text.length > 280;
+        const short = text.length <= 28;
+        speak(hasTask ? "taskAdded" : long ? "noteSavedLong" : short ? "noteSavedShort" : "noteSaved");
         ref.current?.clear();
         ref.current?.focus();
         onCreated?.();
