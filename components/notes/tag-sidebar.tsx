@@ -8,24 +8,32 @@ interface TagSidebarProps {
   tags: { tag: string; count: number }[];
   activeTags: string[];
   openTaskCount: number;
+  view?: "notes" | "tasks";
 }
 
-export function TagSidebar({ tags, activeTags, openTaskCount }: TagSidebarProps) {
+export function TagSidebar({ tags, activeTags, openTaskCount, view = "notes" }: TagSidebarProps) {
+  const notesActive = view === "notes" && activeTags.length === 0;
+  const tasksActive = view === "tasks";
   return (
     <aside className="w-56 shrink-0 border-r border-border bg-background p-3">
       <nav className="flex flex-col gap-1">
         <Link
           href="/notes"
+          aria-current={notesActive ? "page" : undefined}
           className={cn(
             "flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-secondary",
-            activeTags.length === 0 && "bg-secondary font-medium",
+            notesActive && "bg-secondary font-medium",
           )}
         >
           <span>All notes</span>
         </Link>
         <Link
           href="/tasks"
-          className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-secondary"
+          aria-current={tasksActive ? "page" : undefined}
+          className={cn(
+            "flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-secondary",
+            tasksActive && "bg-secondary font-medium",
+          )}
         >
           <span className="flex items-center gap-2">
             <ListChecks className="h-4 w-4" /> Tasks

@@ -14,7 +14,7 @@ export default async function TasksPage() {
   ]);
 
   return (
-    <AppShell sidebar={<TagSidebar tags={tagCounts} activeTags={[]} openTaskCount={openTaskCount} />}>
+    <AppShell sidebar={<TagSidebar tags={tagCounts} activeTags={[]} openTaskCount={openTaskCount} view="tasks" />}>
       <div className="mx-auto w-full max-w-3xl flex-1 overflow-y-auto p-4">
         <h1 className="mb-4 text-lg font-semibold">Tasks</h1>
         <Tabs defaultValue="open">
