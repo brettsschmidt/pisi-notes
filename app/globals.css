@@ -140,6 +140,81 @@ body {
   margin: 0.25rem 0;
 }
 
+/* Spooky frame behind Pisi the cat. Round vignette of moonlit purple,
+   with a small full-moon glow tucked behind the cat's shoulder. */
+.pisi-mascot-frame {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    closest-side,
+    oklch(0.55 0.14 295 / 0.55),
+    oklch(0.35 0.12 295 / 0.45) 55%,
+    oklch(0.18 0.08 295 / 0.15) 80%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 18px oklch(0.55 0.18 295 / 0.45),
+    inset 0 0 12px oklch(0.25 0.1 295 / 0.5);
+}
+.dark .pisi-mascot-frame {
+  background: radial-gradient(
+    closest-side,
+    oklch(0.65 0.2 295 / 0.6),
+    oklch(0.4 0.16 295 / 0.6) 55%,
+    oklch(0.18 0.1 295 / 0.5) 85%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 22px oklch(0.7 0.22 295 / 0.55),
+    inset 0 0 14px oklch(0.3 0.12 295 / 0.7);
+}
+.pisi-mascot-haze {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(
+    ellipse at 30% 80%,
+    oklch(0.85 0.05 295 / 0.25),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+.pisi-mascot-moon {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 9999px;
+  background: oklch(0.97 0.02 95);
+  box-shadow:
+    0 0 8px oklch(0.95 0.05 95 / 0.85),
+    0 0 18px oklch(0.95 0.08 95 / 0.55);
+  pointer-events: none;
+}
+.dark .pisi-mascot-moon {
+  background: oklch(0.93 0.03 95);
+  box-shadow:
+    0 0 10px oklch(0.92 0.07 95 / 0.9),
+    0 0 22px oklch(0.92 0.1 95 / 0.6);
+}
+/* Gentle breathing wobble for the cat sprite. The frame interval handles
+   "real" animation when sprites are present; this keeps her alive even on
+   the static fallback. */
+@keyframes pisi-breathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-1px) scaleY(1.025); }
+}
+.pisi-mascot-cat {
+  animation: pisi-breathe 2.4s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
 /* Bubble for the timeline */
 .pisi-bubble {
   background-color: var(--card);

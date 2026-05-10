@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
+import Link from "@tiptap/extension-link";
 import { Markdown } from "tiptap-markdown";
 import { useEffect, useImperativeHandle, forwardRef } from "react";
 import { HashtagExtension } from "./hashtag-extension";
@@ -37,6 +38,13 @@ export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function
       TaskList,
       TaskItem.configure({ nested: true }),
       Placeholder.configure({ placeholder }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        protocols: ["http", "https", "mailto"],
+        HTMLAttributes: { rel: "noopener noreferrer", target: "_blank" },
+      }),
       Markdown.configure({ html: false, linkify: true, breaks: true, transformPastedText: true }),
       HashtagExtension,
       DoColonExtension,

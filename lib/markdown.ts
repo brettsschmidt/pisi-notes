@@ -50,6 +50,8 @@ export async function renderProseHtml(md: string): Promise<string> {
   if (!md.trim()) return "";
   const file = await processor.process(md);
   let html = String(file);
+  // Open links in a new tab; sanitizer already ran, just augment attrs.
+  html = html.replace(/<a (?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
   // Highlight #hashtags inside text nodes (run on raw HTML — sanitizer already
   // ran, and we only inject a span).
   html = html.replace(HASHTAG_HTML_RE, (_full, prefix: string, tag: string) => {
