@@ -31,8 +31,9 @@
   --input: oklch(0.93 0.01 280);
   --ring: oklch(0.55 0.18 280);
 
-  --task-tint: oklch(0.96 0.06 90);
-  --task-border: oklch(0.85 0.08 90);
+  /* Spooky-cat purple — moonlit lavender in light mode. */
+  --task-tint: oklch(0.95 0.04 295);
+  --task-border: oklch(0.78 0.12 295);
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -69,8 +70,9 @@
   --input: oklch(0.28 0.02 280);
   --ring: oklch(0.7 0.16 280);
 
-  --task-tint: oklch(0.3 0.06 90);
-  --task-border: oklch(0.45 0.08 90);
+  /* Witchy glow in dark mode — deep purple tint, brighter border. */
+  --task-tint: oklch(0.28 0.08 295);
+  --task-border: oklch(0.6 0.18 295);
 }
 
 @theme inline {
