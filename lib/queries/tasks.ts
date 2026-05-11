@@ -38,7 +38,7 @@ export async function listTasks(opts: { done?: boolean } = {}): Promise<TaskRow[
       "id, note_id, text, done, completed_at, completion_note_id, position, created_at, updated_at, notes!tasks_note_id_fkey!inner(created_at, content_md)",
     )
     .order("done", { ascending: true })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: true });
 
   if (opts.done !== undefined) q = q.eq("done", opts.done);
 
