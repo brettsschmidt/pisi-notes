@@ -6,10 +6,13 @@ import type { MascotMood } from "./dialog";
 
 export type MascotAnimation = "idle" | "jump" | "curled";
 
+// Frame counts match what we actually shipped under /public/mascot/<anim>/.
+// `curled` only has a single placeholder frame for now (template animation
+// didn't make the export window) — Pisi just sits stilly when sleepy/sad.
 export const ANIMATION_FRAMES: Record<MascotAnimation, number> = {
   idle: 8,
-  jump: 6,
-  curled: 4,
+  jump: 8,
+  curled: 1,
 };
 
 // Frame display duration in ms. Cat-typical idle ~150ms feels alive without

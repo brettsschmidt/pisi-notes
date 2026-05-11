@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# Unpack the pixellab character ZIP into /public/mascot/{anim}/{i}.png.
-# The ZIP layout is determined empirically: the script greps for files
-# named like *_<frame>.png inside any animation folder and lays them out
-# as 0.png, 1.png, ... in the matching anim directory.
+# Unpack the pixellab character ZIP into /public/mascot/{idle,jump,curled}/.
+# Runs in macOS bash 3.2 (no `mapfile`).
+#
+# The ZIP names animations with hashes like `jumping-747266cf` or
+# `animation-b2ced785`. We map common prefixes to our slot names:
+#   jumping*       -> jump
+#   sleeping*      -> curled
+#   sitting*       -> curled
+#   anything else  -> idle (default)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -18,30 +23,30 @@ fi
 
 echo "unpacking $ZIP into $TMP"
 unzip -qq "$ZIP" -d "$TMP"
-echo "ZIP contents:"
-find "$TMP" -type f | head -50
 
-# For each animation we want, find frames and copy in numeric order.
-copy_anim() {
-  local name="$1" target="$2"
-  mkdir -p "$OUT/$target"
-  # Look for any path containing the animation name + .png, sorted.
-  mapfile -t files < <(find "$TMP" -type f -iname "*.png" | grep -i "/$name/\|/${name}_\|_${name}_" | sort)
-  if (( ${#files[@]} == 0 )); then
-    echo "  no frames found for $name — skipping"
-    return
-  fi
+# For each animation directory, copy frames as 0.png, 1.png, ... into the
+# matching slot in /public/mascot.
+copy_frames() {
+  local anim_dir="$1" slot="$2"
+  mkdir -p "$OUT/$slot"
+  rm -f "$OUT/$slot"/*.png 2>/dev/null || true
   local i=0
-  for f in "${files[@]}"; do
-    cp "$f" "$OUT/$target/$i.png"
+  for f in $(ls "$anim_dir/south"/frame_*.png 2>/dev/null | sort); do
+    cp "$f" "$OUT/$slot/$i.png"
     i=$((i + 1))
   done
-  echo "  $name -> $OUT/$target/ ($i frames)"
+  echo "  $slot <- $(basename "$anim_dir")  ($i frames)"
 }
 
-copy_anim "idle" "idle"
-copy_anim "jump" "jump"
-copy_anim "curled" "curled"
-copy_anim "sitting-on-belly" "curled"  # template name fallback
+if [[ -d "$TMP/animations" ]]; then
+  for anim in "$TMP"/animations/*/; do
+    name="$(basename "$anim")"
+    case "$name" in
+      jumping*|jump*)        copy_frames "$anim" "jump" ;;
+      sleeping*|sitting*|curled*|seated*) copy_frames "$anim" "curled" ;;
+      *)                     copy_frames "$anim" "idle" ;;
+    esac
+  done
+fi
 
 echo "done"
