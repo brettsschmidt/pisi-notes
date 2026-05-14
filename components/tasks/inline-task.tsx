@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Check } from "lucide-react";
 import { toggleTask } from "@/lib/actions/tasks";
 import { speak } from "@/lib/mascot/bus";
+import { renderInlineText } from "@/lib/inline-text";
 import { cn } from "@/lib/utils";
 
 interface InlineTaskProps {
@@ -44,7 +45,9 @@ export function InlineTask({ id, text, done }: InlineTaskProps) {
       >
         {optimistic && <Check className="h-3.5 w-3.5" />}
       </button>
-      <span className={cn("flex-1 text-sm leading-5", optimistic && "text-muted-foreground line-through")}>{text}</span>
+      <span className={cn("flex-1 text-sm leading-5", optimistic && "text-muted-foreground line-through")}>
+        {renderInlineText(text)}
+      </span>
     </div>
   );
 }

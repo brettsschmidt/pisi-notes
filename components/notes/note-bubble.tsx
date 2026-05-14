@@ -53,7 +53,7 @@ export async function NoteBubble({ id, content_md, created_at, archived_at, task
       </header>
       {proseHtml && (
         <div
-          className="prose prose-sm dark:prose-invert max-w-none [&_p]:my-1 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:text-muted-foreground"
+          className="prose prose-sm dark:prose-invert max-w-none [&_p]:my-1 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:text-muted-foreground [&_a]:text-primary [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-1 hover:[&_a]:decoration-2 [&_a]:break-words"
           dangerouslySetInnerHTML={{ __html: proseHtml }}
         />
       )}

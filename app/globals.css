@@ -128,6 +128,31 @@ body {
   font-weight: 500;
 }
 
+/* Link styling — used by task text and prose anchors. Clearly accent-coloured
+   and underlined so URLs stand out against body copy. */
+.pisi-link,
+.pisi-bubble a,
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  word-break: break-word;
+  transition: color 120ms ease;
+}
+.pisi-link:hover,
+.pisi-bubble a:hover,
+.prose a:hover {
+  color: var(--accent-foreground);
+  text-decoration-thickness: 2px;
+}
+.dark .pisi-link,
+.dark .pisi-bubble a,
+.dark .prose a {
+  color: oklch(0.85 0.16 295);
+}
+
 /* Inline task highlight */
 .pisi-task-line {
   background-color: var(--task-tint);

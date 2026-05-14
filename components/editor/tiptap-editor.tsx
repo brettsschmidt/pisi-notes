@@ -66,6 +66,54 @@ export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function
         }
         return false;
       },
+      // Multi-line paste inside a task list explodes into one task per line.
+      // Keeps URL-detection for free since each line goes through the normal
+      // markdown pipeline.
+      handlePaste(view, event) {
+        if (!event.clipboardData) return false;
+        const text = event.clipboardData.getData("text/plain");
+        if (!text || !/[\r\n]/.test(text)) return false;
+
+        const { state } = view;
+        const { $from } = state.selection;
+        let inTaskItem = false;
+        for (let d = $from.depth; d > 0; d--) {
+          if ($from.node(d).type.name === "taskItem") {
+            inTaskItem = true;
+            break;
+          }
+        }
+        if (!inTaskItem) return false;
+
+        const lines = text
+          .split(/\r?\n/)
+          .map((l) => l.replace(/^\s*[-*+]\s*\[[ xX]?\]\s*/, "").trim())
+          .filter((l) => l.length > 0);
+        if (lines.length === 0) return false;
+
+        event.preventDefault();
+        const { schema } = state;
+        const taskItem = schema.nodes.taskItem;
+        const paragraph = schema.nodes.paragraph;
+        if (!taskItem || !paragraph) return false;
+
+        const editor = editorRef.current;
+        if (!editor) return false;
+
+        // Drop the first line into the current task; each subsequent line
+        // becomes a new sibling task item.
+        editor.chain().focus().insertContent(lines[0]).run();
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i];
+          editor
+            .chain()
+            .focus()
+            .splitListItem("taskItem")
+            .insertContent(line)
+            .run();
+        }
+        return true;
+      },
     },
   });
 

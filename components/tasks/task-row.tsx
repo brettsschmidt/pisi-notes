@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { toggleTask } from "@/lib/actions/tasks";
 import { CompletionNoteModal } from "./completion-note-modal";
 import { speak } from "@/lib/mascot/bus";
+import { renderInlineText } from "@/lib/inline-text";
 import type { TaskRow as TaskRowData } from "@/lib/queries/tasks";
 
 interface TaskRowProps {
@@ -49,7 +50,9 @@ export function TaskRow({ task, prefill }: TaskRowProps) {
         {optimistic && <Check className="h-3.5 w-3.5" />}
       </button>
       <div className="flex-1">
-        <p className={cn("text-sm leading-5", optimistic && "text-muted-foreground line-through")}>{task.text}</p>
+        <p className={cn("text-sm leading-5", optimistic && "text-muted-foreground line-through")}>
+          {renderInlineText(task.text)}
+        </p>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <Link href={`/notes#note-${task.note_id}`} className="inline-flex items-center gap-1 hover:underline">
             in note from {formatDistanceToNow(new Date(task.note.created_at), { addSuffix: true })}
