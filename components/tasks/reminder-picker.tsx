@@ -1,7 +1,18 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { format } from "date-fns";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+  addDays,
+  addHours,
+  format,
+  formatDistanceToNow,
+  setHours,
+  setMinutes,
+  setSeconds,
+  startOfHour,
+} from "date-fns";
+import { AlarmClock } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -11,8 +22,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 interface ReminderPickerProps {
   open: boolean;
@@ -24,46 +35,70 @@ interface ReminderPickerProps {
   mode?: "datetime" | "date";
 }
 
-function toLocalInputValue(iso: string | null, mode: "datetime" | "date"): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return mode === "date"
-    ? format(d, "yyyy-MM-dd")
-    : format(d, "yyyy-MM-dd'T'HH:mm");
+interface QuickPick {
+  label: string;
+  build: (from: Date) => Date;
 }
 
-function fromLocalInputValue(value: string, mode: "datetime" | "date"): string | null {
-  if (!value) return null;
-  // datetime-local & date inputs return wall-clock strings — interpret as local
-  // and convert to ISO/UTC for storage.
-  const d = mode === "date" ? new Date(`${value}T09:00`) : new Date(value);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
+const QUICK_PICKS: QuickPick[] = [
+  { label: "in 1 hour",     build: (n) => addHours(startOfHour(n), 1) },
+  { label: "in 3 hours",    build: (n) => addHours(startOfHour(n), 3) },
+  { label: "tonight 8pm",   build: (n) => setSeconds(setMinutes(setHours(n, 20), 0), 0) },
+  { label: "tomorrow 9am",  build: (n) => setSeconds(setMinutes(setHours(addDays(n, 1), 9), 0), 0) },
+  { label: "in a week",     build: (n) => setSeconds(setMinutes(setHours(addDays(n, 7), 9), 0), 0) },
+];
+
+function combineDateAndTime(date: Date, hhmm: string): Date {
+  const [h, m] = hhmm.split(":").map((n) => Number.parseInt(n, 10));
+  const d = new Date(date);
+  d.setHours(Number.isFinite(h) ? h : 9);
+  d.setMinutes(Number.isFinite(m) ? m : 0);
+  d.setSeconds(0);
+  d.setMilliseconds(0);
+  return d;
 }
 
 export function ReminderPicker({
   open,
   onOpenChange,
   title = "Set reminder",
-  description = "We'll send a push notification to your phone when this is due.",
+  description = "Pisi will ping your phone when the time hits.",
   initialIso,
   onSave,
   mode = "datetime",
 }: ReminderPickerProps) {
-  const [value, setValue] = useState(() => toLocalInputValue(initialIso, mode));
+  const initialDate = useMemo(
+    () => (initialIso ? new Date(initialIso) : addHours(startOfHour(new Date()), 1)),
+    [initialIso],
+  );
+  const [date, setDate] = useState<Date | undefined>(initialDate);
+  const [time, setTime] = useState<string>(() => format(initialDate, "HH:mm"));
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open) {
-      // Reset the input each time the dialog opens.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setValue(toLocalInputValue(initialIso, mode));
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setError(null);
-    }
-  }, [open, initialIso, mode]);
+    if (!open) return;
+    const seed = initialIso ? new Date(initialIso) : addHours(startOfHour(new Date()), 1);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDate(seed);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTime(format(seed, "HH:mm"));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setError(null);
+  }, [open, initialIso]);
+
+  const composed = useMemo(() => {
+    if (!date) return null;
+    return mode === "date"
+      ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 9, 0, 0, 0)
+      : combineDateAndTime(date, time);
+  }, [date, time, mode]);
+
+  function applyQuick(pick: QuickPick) {
+    const d = pick.build(new Date());
+    setDate(d);
+    setTime(format(d, "HH:mm"));
+  }
 
   function save(iso: string | null) {
     setError(null);
@@ -79,33 +114,79 @@ export function ReminderPicker({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="reminder-picker-input" className="text-sm">
-            {mode === "date" ? "Date" : "Date & time"}
-          </Label>
-          <Input
-            id="reminder-picker-input"
-            type={mode === "date" ? "date" : "datetime-local"}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            min={mode === "date" ? format(new Date(), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd'T'HH:mm")}
-          />
-          {error && <p className="text-xs text-destructive">{error}</p>}
+
+        <div className="flex flex-wrap gap-1.5">
+          {QUICK_PICKS.map((q) => {
+            const target = q.build(new Date());
+            const active = composed && Math.abs(composed.getTime() - target.getTime()) < 60_000;
+            return (
+              <button
+                key={q.label}
+                type="button"
+                onClick={() => applyQuick(q)}
+                className={cn(
+                  "rounded-full border border-border px-2.5 py-1 text-xs transition-colors",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "bg-background hover:bg-secondary",
+                )}
+              >
+                {q.label}
+              </button>
+            );
+          })}
         </div>
+
+        <div className="flex justify-center rounded-md border border-border bg-background">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => d && setDate(d)}
+            disabled={{ before: new Date(new Date().setHours(0, 0, 0, 0)) }}
+            required
+          />
+        </div>
+
+        {mode !== "date" && (
+          <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-background px-3 py-2">
+            <label htmlFor="reminder-time" className="text-sm font-medium">
+              Time
+            </label>
+            <input
+              id="reminder-time"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="rounded-md border border-border bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+        )}
+
+        <div className="rounded-md bg-secondary px-3 py-2 text-sm">
+          {composed ? (
+            <div className="flex items-center gap-2 text-secondary-foreground">
+              <AlarmClock className="h-4 w-4 text-primary" />
+              <div className="flex-1">
+                <div className="font-medium">{format(composed, "EEEE, MMM d 'at' h:mm a")}</div>
+                <div className="text-xs text-muted-foreground">{formatDistanceToNow(composed, { addSuffix: true })}</div>
+              </div>
+            </div>
+          ) : (
+            <span className="text-muted-foreground">pick a date to continue</span>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-destructive">{error}</p>}
+
         <DialogFooter>
           <div className="flex w-full flex-wrap items-center justify-between gap-2">
             {initialIso ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => save(null)}
-                disabled={pending}
-              >
+              <Button variant="ghost" size="sm" onClick={() => save(null)} disabled={pending}>
                 Clear
               </Button>
             ) : (
@@ -116,10 +197,10 @@ export function ReminderPicker({
                 Cancel
               </Button>
               <Button
-                onClick={() => save(fromLocalInputValue(value, mode))}
-                disabled={pending || !value}
+                onClick={() => save(composed ? composed.toISOString() : null)}
+                disabled={pending || !composed}
               >
-                Save
+                {pending ? "Saving…" : "Save"}
               </Button>
             </div>
           </div>

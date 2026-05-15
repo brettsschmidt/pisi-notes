@@ -48,7 +48,8 @@ export function splitMarkdown(md: string): {
       taskOrder.push(t[1]);
       continue;
     }
-    const r = line.match(/<!--reminder:([a-f0-9-]+)-->/);
+    // Reminder marker may carry an optional `@ISO` time suffix.
+    const r = line.match(/<!--reminder:([a-f0-9-]+)(?:@[^>]+)?-->/);
     if (r) {
       reminderOrder.push(r[1]);
       continue;
