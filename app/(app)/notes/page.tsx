@@ -6,21 +6,25 @@ import { NoteBubble } from "@/components/notes/note-bubble";
 import { NoteComposer } from "@/components/notes/note-composer";
 import { getRecentNotes, getTagCounts, getOpenTaskCount } from "@/lib/queries/notes";
 import { getTasksForNotes } from "@/lib/queries/tasks";
-import { getRemindersForNotes } from "@/lib/queries/reminders";
+import { getRemindersForNotes, getUpcomingReminderDates } from "@/lib/queries/reminders";
+import { getUserPrefs } from "@/lib/queries/prefs";
 
 interface PageProps {
-  searchParams: Promise<{ tag?: string | string[]; q?: string }>;
+  searchParams: Promise<{ tag?: string | string[]; q?: string; remind?: string }>;
 }
 
 export default async function NotesPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const activeTags = Array.isArray(params.tag) ? params.tag : params.tag ? [params.tag] : [];
   const search = params.q?.trim() ?? "";
+  const remindDate = params.remind?.trim() || undefined;
 
-  const [notes, tagCounts, openTaskCount] = await Promise.all([
-    getRecentNotes({ tags: activeTags, search }),
+  const [notes, tagCounts, openTaskCount, upcomingReminders, prefs] = await Promise.all([
+    getRecentNotes({ tags: activeTags, search, remindDate }),
     getTagCounts(),
     getOpenTaskCount(),
+    getUpcomingReminderDates(),
+    getUserPrefs(),
   ]);
   const noteIds = notes.map((n) => n.id);
   const [tasksByNote, remindersByNote] = await Promise.all([
@@ -30,7 +34,18 @@ export default async function NotesPage({ searchParams }: PageProps) {
 
   return (
     <AppShell
-      sidebar={<TagSidebar tags={tagCounts} activeTags={activeTags} openTaskCount={openTaskCount} />}
+      sidebar={
+        <TagSidebar
+          tags={tagCounts}
+          activeTags={activeTags}
+          openTaskCount={openTaskCount}
+          reminders={upcomingReminders}
+          activeRemindDate={remindDate}
+          showRemindersInSidebar={prefs.showRemindersInSidebar}
+          hiddenTags={prefs.hiddenTags}
+          hiddenReminderDates={prefs.hiddenReminderDates}
+        />
+      }
       topbar={<SearchBar />}
     >
       <NoteTimeline scrollKey={notes.length}>

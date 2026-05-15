@@ -153,6 +153,38 @@ body {
   color: oklch(0.85 0.16 295);
 }
 
+/* Calendar day markers — small dot under the day number for any date that
+   has scheduled items. Lights up red when something is overdue. */
+.pisi-cal-day-scheduled > button {
+  position: relative;
+}
+.pisi-cal-day-scheduled > button::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 9999px;
+  background: var(--primary);
+}
+.pisi-cal-day-allDone > button::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 9999px;
+  background: var(--muted-foreground);
+  opacity: 0.5;
+}
+.pisi-cal-day-overdue > button::after {
+  background: var(--destructive);
+}
+
 /* Inline task highlight */
 .pisi-task-line {
   background-color: var(--task-tint);

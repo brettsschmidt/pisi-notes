@@ -1,15 +1,12 @@
 import { AppShell } from "@/components/nav/app-shell";
 import { TagSidebar } from "@/components/notes/tag-sidebar";
-import { TasksShell } from "@/components/tasks/tasks-shell";
-import { listTasks } from "@/lib/queries/tasks";
+import { SettingsForm } from "@/components/settings/settings-form";
 import { getTagCounts, getOpenTaskCount } from "@/lib/queries/notes";
 import { getUpcomingReminderDates } from "@/lib/queries/reminders";
 import { getUserPrefs } from "@/lib/queries/prefs";
 
-export default async function TasksPage() {
-  const [openTasks, doneTasks, tagCounts, openTaskCount, upcomingReminders, prefs] = await Promise.all([
-    listTasks({ done: false }),
-    listTasks({ done: true }),
+export default async function SettingsPage() {
+  const [tagCounts, openTaskCount, upcomingReminders, prefs] = await Promise.all([
     getTagCounts(),
     getOpenTaskCount(),
     getUpcomingReminderDates(),
@@ -23,7 +20,6 @@ export default async function TasksPage() {
           tags={tagCounts}
           activeTags={[]}
           openTaskCount={openTaskCount}
-          view="tasks"
           reminders={upcomingReminders}
           showRemindersInSidebar={prefs.showRemindersInSidebar}
           hiddenTags={prefs.hiddenTags}
@@ -31,7 +27,17 @@ export default async function TasksPage() {
         />
       }
     >
-      <TasksShell openTasks={openTasks} doneTasks={doneTasks} />
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto p-4">
+        <header>
+          <h1 className="text-lg font-semibold">Settings</h1>
+          <p className="text-sm text-muted-foreground">Your stuff. Your way.</p>
+        </header>
+        <SettingsForm
+          showRemindersInSidebar={prefs.showRemindersInSidebar}
+          hiddenTags={prefs.hiddenTags}
+          hiddenReminderDates={prefs.hiddenReminderDates}
+        />
+      </div>
     </AppShell>
   );
 }

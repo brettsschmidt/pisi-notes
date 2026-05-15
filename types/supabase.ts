@@ -160,6 +160,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_prefs: {
+        Row: {
+          user_id: string;
+          show_reminders_in_sidebar: boolean;
+          hidden_tags: { tag: string; hidden_at: string }[];
+          hidden_reminder_dates: { date: string; hidden_at: string }[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          show_reminders_in_sidebar?: boolean;
+          hidden_tags?: { tag: string; hidden_at: string }[];
+          hidden_reminder_dates?: { date: string; hidden_at: string }[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          show_reminders_in_sidebar?: boolean;
+          hidden_tags?: { tag: string; hidden_at: string }[];
+          hidden_reminder_dates?: { date: string; hidden_at: string }[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

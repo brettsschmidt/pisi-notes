@@ -1,15 +1,14 @@
 import { AppShell } from "@/components/nav/app-shell";
 import { TagSidebar } from "@/components/notes/tag-sidebar";
-import { TasksShell } from "@/components/tasks/tasks-shell";
-import { listTasks } from "@/lib/queries/tasks";
+import { CalendarView } from "@/components/calendar/calendar-view";
 import { getTagCounts, getOpenTaskCount } from "@/lib/queries/notes";
+import { getScheduled } from "@/lib/queries/calendar";
 import { getUpcomingReminderDates } from "@/lib/queries/reminders";
 import { getUserPrefs } from "@/lib/queries/prefs";
 
-export default async function TasksPage() {
-  const [openTasks, doneTasks, tagCounts, openTaskCount, upcomingReminders, prefs] = await Promise.all([
-    listTasks({ done: false }),
-    listTasks({ done: true }),
+export default async function CalendarPage() {
+  const [items, tagCounts, openTaskCount, upcomingReminders, prefs] = await Promise.all([
+    getScheduled(),
     getTagCounts(),
     getOpenTaskCount(),
     getUpcomingReminderDates(),
@@ -23,7 +22,7 @@ export default async function TasksPage() {
           tags={tagCounts}
           activeTags={[]}
           openTaskCount={openTaskCount}
-          view="tasks"
+          view="calendar"
           reminders={upcomingReminders}
           showRemindersInSidebar={prefs.showRemindersInSidebar}
           hiddenTags={prefs.hiddenTags}
@@ -31,7 +30,7 @@ export default async function TasksPage() {
         />
       }
     >
-      <TasksShell openTasks={openTasks} doneTasks={doneTasks} />
+      <CalendarView items={items} />
     </AppShell>
   );
 }
