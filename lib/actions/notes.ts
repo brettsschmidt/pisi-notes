@@ -184,3 +184,49 @@ export async function unarchiveNote(id: string) {
   revalidatePath("/notes");
   revalidatePath("/tasks");
 }
+
+// Append a reminder to an existing note. The reminder body is derived from
+// the note's first prose line so the user gets a sensible label without
+// being prompted for it; they can edit the line later via the note editor.
+export async function addReminderToNote(id: string, iso: string) {
+  const { supabase, user } = await requireUser();
+  const { data: note, error: fetchErr } = await supabase
+    .from("notes")
+    .select("content_md")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
+  if (fetchErr || !note) throw fetchErr ?? new Error("note not found");
+
+  const firstProseLine = note.content_md
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .find(
+      (l) =>
+        l.length > 0 &&
+        !l.includes("<!--task:") &&
+        !l.includes("<!--reminder:") &&
+        !/^do:/i.test(l) &&
+        !/^remind:/i.test(l) &&
+        !/^\s*[-*+]?\s*\[[ xX]\]/.test(l) &&
+        !/^\s*\([ xX]\)/.test(l),
+    );
+  const body = (firstProseLine ?? "reminder").replace(/[#*_>`]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+
+  const trimmed = note.content_md.replace(/\s+$/, "");
+  const newMd = `${trimmed}\n( ) [@${iso}] ${body}`;
+  const normalized = normalizeTaskMarkdown(newMd);
+  const tags = extractHashtags(normalized);
+
+  const { error: updateErr } = await supabase
+    .from("notes")
+    .update({ content_md: normalized, tags })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (updateErr) throw updateErr;
+
+  await syncTasksForNote(supabase, user.id, id, normalized);
+  await syncRemindersForNote(supabase, user.id, id, normalized);
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}

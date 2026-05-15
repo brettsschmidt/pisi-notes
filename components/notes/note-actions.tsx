@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Archive, ArchiveRestore, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { AlarmClock, Archive, ArchiveRestore, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TiptapEditor, type TiptapHandle } from "@/components/editor/tiptap-editor";
-import { archiveNote, deleteNote, unarchiveNote, updateNote } from "@/lib/actions/notes";
+import { ReminderPicker } from "@/components/tasks/reminder-picker";
+import { addReminderToNote, archiveNote, deleteNote, unarchiveNote, updateNote } from "@/lib/actions/notes";
 import { speak } from "@/lib/mascot/bus";
 
 interface NoteActionsProps {
@@ -33,6 +34,7 @@ interface NoteActionsProps {
 export function NoteActions({ noteId, initialMarkdown, archived }: NoteActionsProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const editorRef = useRef<TiptapHandle>(null);
 
@@ -90,6 +92,9 @@ export function NoteActions({ noteId, initialMarkdown, archived }: NoteActionsPr
           <DropdownMenuItem onSelect={() => setEditOpen(true)}>
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setReminderOpen(true)}>
+            <AlarmClock className="mr-2 h-4 w-4" /> Add reminder
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={onArchiveToggle}>
             {archived ? (
               <>
@@ -133,6 +138,19 @@ export function NoteActions({ noteId, initialMarkdown, archived }: NoteActionsPr
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ReminderPicker
+        open={reminderOpen}
+        onOpenChange={setReminderOpen}
+        title="Add a reminder to this note"
+        description="Pisi will ping you when the time hits. The reminder text is set to the note's first line — edit it from the note any time."
+        initialIso={null}
+        onSave={async (iso) => {
+          if (!iso) return;
+          await addReminderToNote(noteId, iso);
+          speak("noteEdited");
+        }}
+      />
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className="max-w-md">
