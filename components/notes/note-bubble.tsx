@@ -1,10 +1,12 @@
 import { format, formatDistanceToNow } from "date-fns";
-import { Archive, ListChecks } from "lucide-react";
+import { AlarmClock, Archive, ListChecks } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { renderProseHtml, splitMarkdown } from "@/lib/markdown";
 import { InlineTask } from "@/components/tasks/inline-task";
+import { InlineReminder } from "@/components/reminders/inline-reminder";
 import { NoteActions } from "@/components/notes/note-actions";
 import type { TaskRow } from "@/lib/queries/tasks";
+import type { ReminderRow } from "@/lib/queries/reminders";
 import { cn } from "@/lib/utils";
 
 interface NoteBubbleProps {
@@ -13,13 +15,23 @@ interface NoteBubbleProps {
   created_at: string;
   archived_at?: string | null;
   tasks: TaskRow[];
+  reminders: ReminderRow[];
 }
 
-export async function NoteBubble({ id, content_md, created_at, archived_at, tasks }: NoteBubbleProps) {
+export async function NoteBubble({
+  id,
+  content_md,
+  created_at,
+  archived_at,
+  tasks,
+  reminders,
+}: NoteBubbleProps) {
   const { prose } = splitMarkdown(content_md);
   const proseHtml = await renderProseHtml(prose);
   const sortedTasks = tasks.slice().sort((a, b) => a.position - b.position);
+  const sortedReminders = reminders.slice().sort((a, b) => a.position - b.position);
   const archived = !!archived_at;
+  const openReminders = sortedReminders.filter((r) => !r.done).length;
 
   return (
     <article
@@ -48,6 +60,12 @@ export async function NoteBubble({ id, content_md, created_at, archived_at, task
               <span>{sortedTasks.filter((t) => !t.done).length}/{sortedTasks.length} task{sortedTasks.length === 1 ? "" : "s"}</span>
             </Badge>
           )}
+          {sortedReminders.length > 0 && (
+            <Badge variant="outline" className="gap-1">
+              <AlarmClock className="h-3 w-3" />
+              <span>{openReminders}/{sortedReminders.length} reminder{sortedReminders.length === 1 ? "" : "s"}</span>
+            </Badge>
+          )}
           <NoteActions noteId={id} initialMarkdown={content_md} archived={archived} />
         </div>
       </header>
@@ -61,6 +79,20 @@ export async function NoteBubble({ id, content_md, created_at, archived_at, task
         <div className="mt-2 space-y-1">
           {sortedTasks.map((t) => (
             <InlineTask key={t.id} id={t.id} text={t.text} done={t.done} />
+          ))}
+        </div>
+      )}
+      {sortedReminders.length > 0 && (
+        <div className="mt-2 space-y-1">
+          {sortedReminders.map((r) => (
+            <InlineReminder
+              key={r.id}
+              id={r.id}
+              text={r.text}
+              done={r.done}
+              remind_at={r.remind_at}
+              reminded_at={r.reminded_at}
+            />
           ))}
         </div>
       )}

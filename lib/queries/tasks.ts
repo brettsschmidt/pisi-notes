@@ -8,6 +8,9 @@ export interface TaskRow {
   done: boolean;
   completed_at: string | null;
   completion_note_id: string | null;
+  due_at: string | null;
+  remind_at: string | null;
+  reminded_at: string | null;
   position: number;
   created_at: string;
   updated_at: string;
@@ -24,20 +27,27 @@ interface RawTaskJoin {
   done: boolean;
   completed_at: string | null;
   completion_note_id: string | null;
+  due_at: string | null;
+  remind_at: string | null;
+  reminded_at: string | null;
   position: number;
   created_at: string;
   updated_at: string;
   notes: { created_at: string; content_md: string } | null;
 }
 
+const TASK_FIELDS =
+  "id, note_id, text, done, completed_at, completion_note_id, due_at, remind_at, reminded_at, position, created_at, updated_at";
+
 export async function listTasks(opts: { done?: boolean } = {}): Promise<TaskRow[]> {
   const supabase = await createClient();
   let q = supabase
     .from("tasks")
     .select(
-      "id, note_id, text, done, completed_at, completion_note_id, position, created_at, updated_at, notes!tasks_note_id_fkey!inner(created_at, content_md)",
+      `${TASK_FIELDS}, notes!tasks_note_id_fkey!inner(created_at, content_md)`,
     )
     .order("done", { ascending: true })
+    .order("due_at", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
 
   if (opts.done !== undefined) q = q.eq("done", opts.done);
@@ -52,6 +62,9 @@ export async function listTasks(opts: { done?: boolean } = {}): Promise<TaskRow[
     done: r.done,
     completed_at: r.completed_at,
     completion_note_id: r.completion_note_id,
+    due_at: r.due_at,
+    remind_at: r.remind_at,
+    reminded_at: r.reminded_at,
     position: r.position,
     created_at: r.created_at,
     updated_at: r.updated_at,
@@ -68,7 +81,7 @@ export async function getTasksForNotes(noteIds: string[]): Promise<Map<string, T
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("tasks")
-    .select("id, note_id, text, done, completed_at, completion_note_id, position, created_at, updated_at")
+    .select(TASK_FIELDS)
     .in("note_id", noteIds)
     .order("position", { ascending: true });
   if (error) throw error;
@@ -87,6 +100,7 @@ export async function getTasksForNotes(noteIds: string[]): Promise<Map<string, T
 function snippet(md: string): string {
   return md
     .replace(/<!--task:[a-f0-9-]+-->/g, "")
+    .replace(/<!--reminder:[a-f0-9-]+-->/g, "")
     .replace(/[#*_>`\[\]()]/g, "")
     .replace(/\s+/g, " ")
     .trim()
