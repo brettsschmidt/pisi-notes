@@ -21,6 +21,44 @@ export async function toggleTask(taskId: string, done: boolean) {
   revalidatePath("/tasks");
 }
 
+export async function setTaskDueDate(taskId: string, dueAt: string | null) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("tasks").update({ due_at: dueAt }).eq("id", taskId);
+  if (error) throw error;
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}
+
+export async function setTaskReminder(taskId: string, remindAt: string | null) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase
+    .from("tasks")
+    .update({ remind_at: remindAt })
+    .eq("id", taskId);
+  if (error) throw error;
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}
+
+export async function toggleReminder(reminderId: string, done: boolean) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.rpc("toggle_reminder", { p_id: reminderId, p_done: done });
+  if (error) throw error;
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}
+
+export async function setReminderTime(reminderId: string, remindAt: string | null) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase
+    .from("reminders")
+    .update({ remind_at: remindAt })
+    .eq("id", reminderId);
+  if (error) throw error;
+  revalidatePath("/notes");
+  revalidatePath("/tasks");
+}
+
 export interface CompletionNoteOptions {
   taskId: string;
   content_md: string;

@@ -6,6 +6,7 @@ import { NoteBubble } from "@/components/notes/note-bubble";
 import { NoteComposer } from "@/components/notes/note-composer";
 import { getRecentNotes, getTagCounts, getOpenTaskCount } from "@/lib/queries/notes";
 import { getTasksForNotes } from "@/lib/queries/tasks";
+import { getRemindersForNotes } from "@/lib/queries/reminders";
 
 interface PageProps {
   searchParams: Promise<{ tag?: string | string[]; q?: string }>;
@@ -21,7 +22,11 @@ export default async function NotesPage({ searchParams }: PageProps) {
     getTagCounts(),
     getOpenTaskCount(),
   ]);
-  const tasksByNote = await getTasksForNotes(notes.map((n) => n.id));
+  const noteIds = notes.map((n) => n.id);
+  const [tasksByNote, remindersByNote] = await Promise.all([
+    getTasksForNotes(noteIds),
+    getRemindersForNotes(noteIds),
+  ]);
 
   return (
     <AppShell
@@ -42,6 +47,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
               created_at={n.created_at}
               archived_at={n.archived_at}
               tasks={tasksByNote.get(n.id) ?? []}
+              reminders={remindersByNote.get(n.id) ?? []}
             />
           ))
         )}

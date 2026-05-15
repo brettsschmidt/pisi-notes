@@ -43,9 +43,12 @@ export type Database = {
           completion_note_id: string | null;
           created_at: string;
           done: boolean;
+          due_at: string | null;
           id: string;
           note_id: string;
           position: number;
+          remind_at: string | null;
+          reminded_at: string | null;
           text: string;
           updated_at: string;
           user_id: string;
@@ -55,9 +58,12 @@ export type Database = {
           completion_note_id?: string | null;
           created_at?: string;
           done?: boolean;
+          due_at?: string | null;
           id?: string;
           note_id: string;
           position?: number;
+          remind_at?: string | null;
+          reminded_at?: string | null;
           text: string;
           updated_at?: string;
           user_id: string;
@@ -67,11 +73,89 @@ export type Database = {
           completion_note_id?: string | null;
           created_at?: string;
           done?: boolean;
+          due_at?: string | null;
           id?: string;
           note_id?: string;
           position?: number;
+          remind_at?: string | null;
+          reminded_at?: string | null;
           text?: string;
           updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      reminders: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          done: boolean;
+          id: string;
+          note_id: string;
+          position: number;
+          remind_at: string | null;
+          reminded_at: string | null;
+          text: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          done?: boolean;
+          id?: string;
+          note_id: string;
+          position?: number;
+          remind_at?: string | null;
+          reminded_at?: string | null;
+          text: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          done?: boolean;
+          id?: string;
+          note_id?: string;
+          position?: number;
+          remind_at?: string | null;
+          reminded_at?: string | null;
+          text?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          auth: string;
+          created_at: string;
+          endpoint: string;
+          id: string;
+          p256dh: string;
+          updated_at: string;
+          user_agent: string | null;
+          user_id: string;
+        };
+        Insert: {
+          auth: string;
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          p256dh: string;
+          updated_at?: string;
+          user_agent?: string | null;
+          user_id: string;
+        };
+        Update: {
+          auth?: string;
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          p256dh?: string;
+          updated_at?: string;
+          user_agent?: string | null;
           user_id?: string;
         };
         Relationships: [];
@@ -91,9 +175,31 @@ export type Database = {
           completion_note_id: string | null;
           created_at: string;
           done: boolean;
+          due_at: string | null;
           id: string;
           note_id: string;
           position: number;
+          remind_at: string | null;
+          reminded_at: string | null;
+          text: string;
+          updated_at: string;
+          user_id: string;
+        };
+      };
+      toggle_reminder: {
+        Args: {
+          p_id: string;
+          p_done: boolean;
+        };
+        Returns: {
+          completed_at: string | null;
+          created_at: string;
+          done: boolean;
+          id: string;
+          note_id: string;
+          position: number;
+          remind_at: string | null;
+          reminded_at: string | null;
           text: string;
           updated_at: string;
           user_id: string;

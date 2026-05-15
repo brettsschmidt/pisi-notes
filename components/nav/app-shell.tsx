@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationsButton } from "@/components/pwa/notifications-button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { signOut } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,7 @@ export function AppShell({ sidebar, topbar, children }: AppShellProps) {
         </div>
         <div className="flex flex-1 items-center justify-center gap-2 px-2">{topbar}</div>
         <div className="flex items-center gap-1">
+          <NotificationsButton />
           <ThemeToggle />
           <form action={signOut}>
             <Button type="submit" variant="ghost" size="sm" aria-label="sign out">

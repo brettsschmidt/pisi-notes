@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { extractHashtags } from "@/lib/tags";
-import { normalizeTaskMarkdown, parseTasksFromMarkdown } from "@/lib/tasks-md";
+import {
+  normalizeTaskMarkdown,
+  parseRemindersFromMarkdown,
+  parseTasksFromMarkdown,
+} from "@/lib/tasks-md";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -59,6 +63,51 @@ async function syncTasksForNote(
   }
 }
 
+async function syncRemindersForNote(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  noteId: string,
+  md: string,
+) {
+  const parsed = parseRemindersFromMarkdown(md);
+  const { data: existing } = await supabase.from("reminders").select("id, done").eq("note_id", noteId);
+  const existingMap = new Map((existing ?? []).map((r) => [r.id, r]));
+  const seen = new Set<string>();
+
+  for (const rem of parsed) {
+    seen.add(rem.id);
+    const prior = existingMap.get(rem.id);
+    if (!prior) {
+      await supabase.from("reminders").insert({
+        id: rem.id,
+        user_id: userId,
+        note_id: noteId,
+        text: rem.text,
+        done: rem.done,
+        position: rem.position,
+        completed_at: rem.done ? new Date().toISOString() : null,
+      });
+    } else {
+      const update: {
+        text: string;
+        position: number;
+        done?: boolean;
+        completed_at?: string | null;
+      } = { text: rem.text, position: rem.position };
+      if (prior.done !== rem.done) {
+        update.done = rem.done;
+        update.completed_at = rem.done ? new Date().toISOString() : null;
+      }
+      await supabase.from("reminders").update(update).eq("id", rem.id);
+    }
+  }
+
+  const orphans = (existing ?? []).filter((r) => !seen.has(r.id)).map((r) => r.id);
+  if (orphans.length) {
+    await supabase.from("reminders").delete().in("id", orphans);
+  }
+}
+
 export async function createNote(content_md: string): Promise<{ id: string }> {
   const trimmed = content_md.trim();
   if (!trimmed) throw new Error("note is empty");
@@ -74,6 +123,7 @@ export async function createNote(content_md: string): Promise<{ id: string }> {
   if (error || !data) throw error ?? new Error("failed to insert note");
 
   await syncTasksForNote(supabase, user.id, data.id, normalized);
+  await syncRemindersForNote(supabase, user.id, data.id, normalized);
   revalidatePath("/notes");
   revalidatePath("/tasks");
   return { id: data.id };
@@ -94,6 +144,7 @@ export async function updateNote(id: string, content_md: string) {
   if (error) throw error;
 
   await syncTasksForNote(supabase, user.id, id, normalized);
+  await syncRemindersForNote(supabase, user.id, id, normalized);
   revalidatePath("/notes");
   revalidatePath("/tasks");
 }
