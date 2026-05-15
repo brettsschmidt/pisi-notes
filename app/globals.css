@@ -128,6 +128,34 @@ body {
   font-weight: 500;
 }
 
+/* Reminder time tokens (`[@<ISO>]` inside the Tiptap editor): collapse the
+   raw chars entirely and render a friendly chip via a widget decoration in
+   their place. `display: none` is safe here because the chars round-trip
+   through tiptap-markdown via the document model, not the DOM. */
+.pisi-remind-token-raw {
+  display: none;
+}
+.pisi-remind-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.05rem 0.45rem;
+  margin: 0 0.15rem;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
+  vertical-align: baseline;
+}
+.pisi-remind-chip::before {
+  content: "⏰";
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
 /* Link styling — used by task text and prose anchors. Clearly accent-coloured
    and underlined so URLs stand out against body copy. */
 .pisi-link,

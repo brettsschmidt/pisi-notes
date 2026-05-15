@@ -10,6 +10,8 @@ import { Markdown } from "tiptap-markdown";
 import { useEffect, useImperativeHandle, forwardRef } from "react";
 import { HashtagExtension } from "./hashtag-extension";
 import { DoColonExtension } from "./do-colon-extension";
+import { ReminderShortcutExtension } from "./reminder-shortcut-extension";
+import { RemindTokenDecoration } from "./remind-token-decoration";
 import { cn } from "@/lib/utils";
 
 export interface TiptapHandle {
@@ -28,7 +30,7 @@ export interface TiptapEditorProps {
 }
 
 export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function TiptapEditor(
-  { initialMarkdown = "", placeholder = "Write a note… use `do:` for a task, `remind:` for a reminder, #hashtags work too.", onSubmit, className, ariaLabel },
+  { initialMarkdown = "", placeholder = "Write a note… `do:` for a task, `monday:` or `5/25:` for a reminder, #hashtags work too.", onSubmit, className, ariaLabel },
   ref,
 ) {
   const editor = useEditor({
@@ -48,6 +50,8 @@ export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function
       Markdown.configure({ html: false, linkify: true, breaks: true, transformPastedText: true }),
       HashtagExtension,
       DoColonExtension,
+      ReminderShortcutExtension,
+      RemindTokenDecoration,
     ],
     content: initialMarkdown ? { type: "doc", content: [] } : "",
     editorProps: {

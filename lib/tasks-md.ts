@@ -26,9 +26,12 @@ const REMINDER_LINE_RE = new RegExp(
   `^(\\s*)\\(([ xX])\\)\\s*(?:<!--reminder:([a-f0-9-]+)(?:@(${ISO_RE.source}))?-->\\s*)?(.*)$`,
 );
 const REMIND_COLON_RE = /^(\s*)remind:\s+(.*)$/i;
-// `[@ISO] body` — produced by the editor's remind-colon extension after the
-// time picker. Pulled out before storing the reminder so the body stays clean.
-const TIME_TOKEN_RE = new RegExp(`\\[@(${ISO_RE.source})\\]\\s*`);
+// `[@ISO] body` — produced by the editor's reminder shortcuts (e.g. `monday:`)
+// and by the composer's time picker. Both bracket characters may arrive
+// backslash-escaped because tiptap-markdown escapes `[` and `]` when it
+// serializes the editor document to markdown. We accept either form so the
+// token is always folded into the canonical `<!--reminder:UUID@ISO-->` comment.
+const TIME_TOKEN_RE = new RegExp(`\\\\?\\[@(${ISO_RE.source})\\\\?\\]\\s*`);
 
 /**
  * Rewrites loose task/reminder syntax into canonical lines and ensures every
