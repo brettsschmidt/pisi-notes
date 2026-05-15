@@ -85,15 +85,17 @@ async function syncRemindersForNote(
         text: rem.text,
         done: rem.done,
         position: rem.position,
+        remind_at: rem.remindAt,
         completed_at: rem.done ? new Date().toISOString() : null,
       });
     } else {
       const update: {
         text: string;
         position: number;
+        remind_at: string | null;
         done?: boolean;
         completed_at?: string | null;
-      } = { text: rem.text, position: rem.position };
+      } = { text: rem.text, position: rem.position, remind_at: rem.remindAt };
       if (prior.done !== rem.done) {
         update.done = rem.done;
         update.completed_at = rem.done ? new Date().toISOString() : null;

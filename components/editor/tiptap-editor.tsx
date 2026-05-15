@@ -28,7 +28,7 @@ export interface TiptapEditorProps {
 }
 
 export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function TiptapEditor(
-  { initialMarkdown = "", placeholder = "Write a note… use `do:` for a task, `:remind` for a reminder, #hashtags work too.", onSubmit, className, ariaLabel },
+  { initialMarkdown = "", placeholder = "Write a note… use `do:` for a task, `remind:` for a reminder, #hashtags work too.", onSubmit, className, ariaLabel },
   ref,
 ) {
   const editor = useEditor({

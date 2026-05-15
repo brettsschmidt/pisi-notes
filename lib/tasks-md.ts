@@ -12,24 +12,32 @@ export interface ParsedReminder {
   text: string;
   done: boolean;
   position: number;
+  remindAt: string | null;
 }
 
 const TASK_LINE_RE = /^(\s*)(?:[-*+]\s+)?\[([ xX])\]\s*(?:<!--task:([a-f0-9-]+)-->\s*)?(.*)$/;
 const DO_COLON_RE = /^(\s*)(?:do|todo):\s+(.*)$/i;
 
-// Reminder line: `(  ) <!--reminder:UUID--> body`. Parens mirror the GFM
-// task-list shape so reminders feel like a sibling concept to tasks.
-const REMINDER_LINE_RE = /^(\s*)\(([ xX])\)\s*(?:<!--reminder:([a-f0-9-]+)-->\s*)?(.*)$/;
-const REMIND_COLON_RE = /^(\s*)(?::?remind|remind:)\s+(.*)$/i;
+// Reminder line: `( ) <!--reminder:UUID@ISO--> body`. Parens mirror the GFM
+// task-list shape; the optional `@ISO` after the UUID carries the picked
+// remind_at time so the markdown stays the single source of truth.
+const ISO_RE = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?/;
+const REMINDER_LINE_RE = new RegExp(
+  `^(\\s*)\\(([ xX])\\)\\s*(?:<!--reminder:([a-f0-9-]+)(?:@(${ISO_RE.source}))?-->\\s*)?(.*)$`,
+);
+const REMIND_COLON_RE = /^(\s*)remind:\s+(.*)$/i;
+// `[@ISO] body` — produced by the editor's remind-colon extension after the
+// time picker. Pulled out before storing the reminder so the body stays clean.
+const TIME_TOKEN_RE = new RegExp(`\\[@(${ISO_RE.source})\\]\\s*`);
 
 /**
  * Rewrites loose task/reminder syntax into canonical lines and ensures every
  * checkbox has a stable id encoded as an HTML comment. Idempotent.
  *
- *   `do: buy milk`               →  `- [ ] <!--task:UUID--> buy milk`
- *   `- [x] foo`                  →  `- [x] <!--task:UUID--> foo`
- *   `:remind call mom`           →  `( ) <!--reminder:UUID--> call mom`
- *   `remind: call mom`           →  `( ) <!--reminder:UUID--> call mom`
+ *   `do: buy milk`                       →  `- [ ] <!--task:UUID--> buy milk`
+ *   `- [x] foo`                          →  `- [x] <!--task:UUID--> foo`
+ *   `remind: call mom`                   →  `( ) <!--reminder:UUID--> call mom`
+ *   `( ) [@2026-05-15T18:00Z] call mom`  →  `( ) <!--reminder:UUID@2026-05-15T18:00Z--> call mom`
  *   `( ) <!--reminder:abc--> bar` (untouched, id preserved)
  */
 export function normalizeTaskMarkdown(md: string): string {
@@ -37,15 +45,22 @@ export function normalizeTaskMarkdown(md: string): string {
   const out = lines.map((line) => {
     const remindColon = line.match(REMIND_COLON_RE);
     if (remindColon) {
-      const [, indent, body] = remindColon;
-      return `${indent}( ) <!--reminder:${uuid()}--> ${body}`;
+      const [, indent, rest] = remindColon;
+      const { time, body } = extractTimeToken(rest);
+      const suffix = time ? `@${time}` : "";
+      return `${indent}( ) <!--reminder:${uuid()}${suffix}--> ${body}`;
     }
     const remindLine = line.match(REMINDER_LINE_RE);
     if (remindLine) {
-      const [, indent, mark, existingId, body] = remindLine;
+      const [, indent, mark, existingId, existingTime, rest] = remindLine;
       const id = existingId ?? uuid();
       const checked = mark.toLowerCase() === "x" ? "x" : " ";
-      return `${indent}(${checked}) <!--reminder:${id}--> ${body}`.trimEnd();
+      // Pull a time out of the visible body if the user typed one inline
+      // after a previous edit; otherwise keep whatever the comment already had.
+      const { time: bodyTime, body } = extractTimeToken(rest);
+      const time = bodyTime ?? existingTime ?? null;
+      const suffix = time ? `@${time}` : "";
+      return `${indent}(${checked}) <!--reminder:${id}${suffix}--> ${body}`.trimEnd();
     }
     const doMatch = line.match(DO_COLON_RE);
     if (doMatch) {
@@ -93,16 +108,29 @@ export function parseRemindersFromMarkdown(md: string): ParsedReminder[] {
   lines.forEach((line) => {
     const m = line.match(REMINDER_LINE_RE);
     if (!m) return;
-    const [, , mark, id, body] = m;
+    const [, , mark, id, time, rest] = m;
     if (!id) return;
+    const { body } = extractTimeToken(rest);
     out.push({
       id,
       text: body.trim(),
       done: mark.toLowerCase() === "x",
       position: out.length,
+      remindAt: time ?? null,
     });
   });
   return out;
+}
+
+// Strip a leading `[@ISO]` token from a reminder body, returning the time
+// and the cleaned body. Used by both normalize and parse so the user never
+// sees raw ISO timestamps in the rendered note.
+function extractTimeToken(text: string): { time: string | null; body: string } {
+  const m = text.match(TIME_TOKEN_RE);
+  if (!m) return { time: null, body: text };
+  const time = m[1];
+  const body = text.replace(TIME_TOKEN_RE, "").trim();
+  return { time, body };
 }
 
 /**
