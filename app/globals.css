@@ -128,6 +128,14 @@ body {
   font-weight: 500;
 }
 
+/* Search-hit highlight inside rendered note prose. */
+.pisi-search-hit {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border-radius: 0.2rem;
+  padding: 0 0.1rem;
+}
+
 /* Reminder time tokens (`[@<ISO>]` inside the Tiptap editor): collapse the
    raw chars entirely and render a friendly chip via a widget decoration in
    their place. `display: none` is safe here because the chars round-trip

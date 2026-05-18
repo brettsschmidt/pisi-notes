@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationsButton } from "@/components/pwa/notifications-button";
@@ -21,10 +21,15 @@ export function AppShell({ sidebar, topbar, children }: AppShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Auto-close the drawer on any route or filter change.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname, searchParams]);
+  // Auto-close the drawer on any route or filter change. Done via the
+  // "adjust state during render" pattern (React-endorsed) instead of an
+  // effect so there's no extra render pass.
+  const navKey = `${pathname}?${searchParams.toString()}`;
+  const [lastNavKey, setLastNavKey] = useState(navKey);
+  if (navKey !== lastNavKey) {
+    setLastNavKey(navKey);
+    if (open) setOpen(false);
+  }
 
   return (
     <div className="flex h-dvh flex-col">

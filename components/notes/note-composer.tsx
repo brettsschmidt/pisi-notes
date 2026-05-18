@@ -14,12 +14,55 @@ interface NoteComposerProps {
   onCreated?: () => void;
 }
 
+// A note in progress is the most precious thing in the app — never lose it to
+// a refresh, crash, or accidental tab close. The draft is mirrored to
+// localStorage as the user types and restored on next mount.
+const DRAFT_STORAGE_KEY = "pisi-composer-draft";
+
+function readDraft(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return localStorage.getItem(DRAFT_STORAGE_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function writeDraft(md: string) {
+  try {
+    if (md.trim()) localStorage.setItem(DRAFT_STORAGE_KEY, md);
+    else localStorage.removeItem(DRAFT_STORAGE_KEY);
+  } catch {
+    /* private mode / storage full — non-fatal */
+  }
+}
+
+function countWords(md: string): number {
+  // Strip task/reminder markers and markdown punctuation, then count tokens.
+  const text = md
+    .replace(/<!--(?:task|reminder):[^>]*-->/g, "")
+    .replace(/\[@[^\]]*\]/g, "")
+    .replace(/[#*_>`[\]()~-]/g, " ")
+    .trim();
+  if (!text) return 0;
+  return text.split(/\s+/).filter(Boolean).length;
+}
+
 export function NoteComposer({ onCreated }: NoteComposerProps) {
   const ref = useRef<TiptapHandle>(null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [remindAt, setRemindAt] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Captured once: any draft left over from a previous session. The editor
+  // restores it via its own `initialMarkdown` handling.
+  const [initialDraft] = useState(readDraft);
+  const [wordCount, setWordCount] = useState(() => countWords(initialDraft));
+
+  function onEditorChange(md: string) {
+    writeDraft(md);
+    setWordCount(countWords(md));
+  }
 
   function submit(md?: string) {
     const text = (md ?? ref.current?.getMarkdown() ?? "").trim();
@@ -41,6 +84,8 @@ export function NoteComposer({ onCreated }: NoteComposerProps) {
         speak(hasTask ? "taskAdded" : long ? "noteSavedLong" : short ? "noteSavedShort" : "noteSaved");
         ref.current?.clear();
         ref.current?.focus();
+        writeDraft(""); // note is safely persisted — discard the draft
+        setWordCount(0);
         setRemindAt(null);
         onCreated?.();
       } catch (e) {
@@ -77,7 +122,9 @@ export function NoteComposer({ onCreated }: NoteComposerProps) {
           ref={ref}
           ariaLabel="note composer"
           className="flex-1"
+          initialMarkdown={initialDraft}
           onSubmit={(md) => submit(md)}
+          onChange={onEditorChange}
         />
         <Button
           type="button"
@@ -98,7 +145,18 @@ export function NoteComposer({ onCreated }: NoteComposerProps) {
           <Send className="h-4 w-4" />
         </Button>
       </div>
-      {error && <p className="mx-auto max-w-3xl px-3 pb-2 text-xs text-destructive">{error}</p>}
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-3 pb-2">
+        {error ? (
+          <p className="text-xs text-destructive">{error}</p>
+        ) : (
+          <span />
+        )}
+        {wordCount > 0 && (
+          <span className="text-xs tabular-nums text-muted-foreground">
+            {wordCount} word{wordCount === 1 ? "" : "s"}
+          </span>
+        )}
+      </div>
       <ReminderPicker
         open={pickerOpen}
         onOpenChange={setPickerOpen}

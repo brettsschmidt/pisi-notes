@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { AlarmClock, Archive, ArchiveRestore, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { AlarmClock, Archive, ArchiveRestore, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,16 +22,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TiptapEditor, type TiptapHandle } from "@/components/editor/tiptap-editor";
 import { ReminderPicker } from "@/components/tasks/reminder-picker";
-import { addReminderToNote, archiveNote, deleteNote, unarchiveNote, updateNote } from "@/lib/actions/notes";
+import {
+  addReminderToNote,
+  archiveNote,
+  deleteNote,
+  setNotePinned,
+  unarchiveNote,
+  updateNote,
+} from "@/lib/actions/notes";
 import { speak } from "@/lib/mascot/bus";
 
 interface NoteActionsProps {
   noteId: string;
   initialMarkdown: string;
   archived: boolean;
+  pinned: boolean;
 }
 
-export function NoteActions({ noteId, initialMarkdown, archived }: NoteActionsProps) {
+export function NoteActions({ noteId, initialMarkdown, archived, pinned }: NoteActionsProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
@@ -60,6 +68,16 @@ export function NoteActions({ noteId, initialMarkdown, archived }: NoteActionsPr
         setDeleteOpen(false);
       } catch {
         setDeleteOpen(false);
+      }
+    });
+  }
+
+  function onPinToggle() {
+    startTransition(async () => {
+      try {
+        await setNotePinned(noteId, !pinned);
+      } catch {
+        /* ignore */
       }
     });
   }
@@ -94,6 +112,17 @@ export function NoteActions({ noteId, initialMarkdown, archived }: NoteActionsPr
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setReminderOpen(true)}>
             <AlarmClock className="mr-2 h-4 w-4" /> Add reminder
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={onPinToggle}>
+            {pinned ? (
+              <>
+                <PinOff className="mr-2 h-4 w-4" /> Unpin
+              </>
+            ) : (
+              <>
+                <Pin className="mr-2 h-4 w-4" /> Pin to top
+              </>
+            )}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={onArchiveToggle}>
             {archived ? (

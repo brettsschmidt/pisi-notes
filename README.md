@@ -1,17 +1,20 @@
 # pisi-notes
 
-Rich-text note-taking that travels as Markdown. Notes are written in a chat-style timeline with the latest at the bottom, hashtags auto-build categories, and any line written as `do: …` (or `- [ ] …`) becomes a tracked task that you can check off and link back to.
+Rich-text note-taking that travels as Markdown. Notes are written in a chat-style timeline with the latest at the bottom, hashtags auto-build categories, and any line written as `do: …` (or `- [ ] …`) becomes a tracked task that you can check off and link back to. Reminders, a calendar view, web-push notifications, dark mode, a draggable mascot, and a companion CLI round it out.
 
 A companion CLI (`pisi`) syncs your notes to a folder of `.md` files.
 
-The web app shares its Supabase project with [Baby-food](https://github.com/brettsschmidt/Baby-food), so existing accounts work here.
+The web app shares its Supabase project with [Baby-food](https://github.com/brettsschmidt/Baby-food) — its own tables live in a dedicated `pisi` Postgres schema so the apps don't collide. Existing accounts work here.
 
 ## Stack
 
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind v4 + shadcn/ui (new-york preset)
-- Supabase (`@supabase/ssr`)
-- Tiptap with `tiptap-markdown`, task list, custom hashtag highlighter, custom `do:` input rule
+- Supabase (`@supabase/ssr`) — tables namespaced under the `pisi` schema
+- Tiptap with `tiptap-markdown`, task list, custom hashtag highlighter, custom `do:` / reminder input rules
+- `react-day-picker` for the calendar + reminder time picker
+- PWA: web manifest + service worker, Web Push for reminders
+- Deployed to Cloudflare Workers via OpenNext
 - CLI: Commander + prompts, bundled with tsup
 
 ## Setup
@@ -24,11 +27,7 @@ cp .env.example .env.local
 #         SUPABASE_SERVICE_ROLE_KEY, SUPABASE_PROJECT_ID
 ```
 
-Apply the migration to the shared Supabase project (Supabase SQL Editor or `supabase db push`):
-
-```
-supabase/migrations/0001_pisi_notes_init.sql
-```
+Apply the migrations in `supabase/migrations/` in order (Supabase SQL Editor or `supabase db push`). They create the `pisi` schema and its tables — `notes`, `tasks`, `reminders`, `push_subscriptions`, `user_prefs` — all with row-level security scoped to the signed-in user.
 
 Then regenerate types:
 
@@ -46,9 +45,49 @@ npm run typecheck
 
 ## Notes UX
 
-- `/notes` — timeline (oldest at top, newest at bottom). Composer is sticky at the bottom; **Cmd/Ctrl+Enter** sends.
+- `/notes` — timeline (oldest at top, newest at bottom). Composer is sticky at the bottom; **Cmd/Ctrl+Enter** sends. A live word count shows as you write.
+- **Drafts never get lost** — the composer mirrors what you're typing to `localStorage` and restores it after a refresh, crash, or accidental tab close.
 - Sidebar shows your tags by frequency. Click a tag to filter; click again to remove. Multiple tags AND together.
-- The search bar accepts free text and `#tag` tokens.
+- The search bar accepts free text and `#tag` tokens; an `×` clears it. Matches are highlighted in the results.
+- Every note has a `⋯` menu: **Edit**, **Add reminder**, **Pin to top**, **Archive**, **Delete**.
+- Pinned notes lift into an always-visible band above the timeline.
+- Archived notes stay in the timeline (flagged + dimmed) but drop out of the tag sidebar, tag filters, and search; archiving also strips the note's tags.
+- Links paste in and render as clickable, styled anchors. Pasting newline-separated text into a task list explodes into one task per line.
+
+## Keyboard shortcuts
+
+| Keys | Action |
+| --- | --- |
+| `/` | Focus search |
+| `c` | Jump to the note composer |
+| `g` then `n` / `t` / `a` / `s` | Go to Notes / Tasks / Calendar / Settings |
+| `?` | Show the shortcuts overlay |
+| `Esc` | Close dialogs / blur inputs |
+
+## Reminders
+
+Reminders are a sibling concept to tasks — written as `( ) …` lines and pushed to your phone when due.
+
+```
+remind: call the dentist
+monday: sprint planning          # next Monday, 9am local
+fri: submit timesheet            # 3-letter abbreviations work too
+5/25: mom's birthday             # M/D — 9am local, rolls to next year if past
+5/25/2027: …                     # explicit year
+```
+
+- Day/date shortcuts resolve to a concrete time inline; the editor shows a friendly `⏰` chip.
+- The composer's alarm-clock button opens a calendar + time picker for an explicit time.
+- `/calendar` — month grid with a dot on every day that has a reminder or due task; click a day to see what's scheduled.
+- Settings can surface upcoming reminder dates as a sidebar section; sidebar tags and dates can be hidden (with an `×`) and restored from Settings.
+
+## Settings
+
+`/settings` — toggle the sidebar reminders section and restore any tags / reminder dates you've hidden. Hidden entries also reappear automatically once fresh matching content shows up.
+
+## Install as an app
+
+pisi-notes is a PWA: a web manifest, icons, and a service worker are served, so mobile browsers offer **Add to Home Screen** / **Install**. Reminders fire as native web-push notifications via the service worker.
 
 ## Tasks
 

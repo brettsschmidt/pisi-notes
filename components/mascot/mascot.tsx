@@ -53,25 +53,34 @@ function clampPosition(p: MascotPosition): MascotPosition {
   };
 }
 
+// Read the saved position (or fall back to the default), clamped to the
+// current viewport. Runs only on the client — Pisi is loaded with ssr:false.
+function initialPosition(): MascotPosition {
+  try {
+    const raw = localStorage.getItem(POSITION_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as MascotPosition;
+      if (typeof parsed.x === "number" && typeof parsed.y === "number") {
+        return clampPosition(parsed);
+      }
+    }
+  } catch {
+    /* corrupt entry — fall through */
+  }
+  return clampPosition(defaultPosition());
+}
+
 interface MascotProps {
   greetOnMount?: boolean;
 }
 
 export function Mascot({ greetOnMount = false }: MascotProps) {
-  // Don't render Pisi until we're on the client — position depends on viewport
-  // dimensions, which differ from the SSR fallback and would otherwise cause
-  // a hydration mismatch.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const [line, setLine] = useState<MascotLine | null>(null);
   const [bouncing, setBouncing] = useState(false);
   const [anim, setAnim] = useState<MascotAnimation>("idle");
   const [frame, setFrame] = useState(0);
   const [framesLoadable, setFramesLoadable] = useState(true);
-  const [position, setPosition] = useState<MascotPosition>({ x: 0, y: 0 });
+  const [position, setPosition] = useState<MascotPosition>(initialPosition);
   const [dragging, setDragging] = useState(false);
   const [bouncingPhysics, setBouncingPhysics] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -98,23 +107,8 @@ export function Mascot({ greetOnMount = false }: MascotProps) {
     positionRef.current = position;
   }, [position]);
 
-  // Restore position + clamp on mount and on resize.
+  // Keep her inside the viewport when the window resizes.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(POSITION_STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as MascotPosition;
-        if (typeof parsed.x === "number" && typeof parsed.y === "number") {
-          setPosition(clampPosition(parsed));
-        } else {
-          setPosition(clampPosition(defaultPosition()));
-        }
-      } else {
-        setPosition(clampPosition(defaultPosition()));
-      }
-    } catch {
-      setPosition(clampPosition(defaultPosition()));
-    }
     function onResize() {
       setPosition((p) => clampPosition(p));
     }
@@ -308,8 +302,6 @@ export function Mascot({ greetOnMount = false }: MascotProps) {
         : line?.mood === "cheer"
           ? "saturate(1.15) brightness(1.05)"
           : undefined;
-
-  if (!mounted) return null;
 
   // Suppress conflicting transforms while she's actively in motion so the
   // sprite tracks position cleanly.

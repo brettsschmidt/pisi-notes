@@ -13,6 +13,7 @@ export type Database = {
           content_md: string;
           created_at: string;
           id: string;
+          pinned_at: string | null;
           tags: string[];
           updated_at: string;
           user_id: string;
@@ -22,6 +23,7 @@ export type Database = {
           content_md: string;
           created_at?: string;
           id?: string;
+          pinned_at?: string | null;
           tags?: string[];
           updated_at?: string;
           user_id: string;
@@ -31,6 +33,7 @@ export type Database = {
           content_md?: string;
           created_at?: string;
           id?: string;
+          pinned_at?: string | null;
           tags?: string[];
           updated_at?: string;
           user_id?: string;

@@ -9,6 +9,7 @@ export interface NoteRow {
   created_at: string;
   updated_at: string;
   archived_at: string | null;
+  pinned_at: string | null;
 }
 
 export interface NoteFilters {
@@ -24,7 +25,7 @@ export async function getRecentNotes(filters: NoteFilters = {}): Promise<NoteRow
   const limit = filters.limit ?? 200;
   let q = supabase
     .from("notes")
-    .select("id, content_md, tags, created_at, updated_at, archived_at")
+    .select("id, content_md, tags, created_at, updated_at, archived_at, pinned_at")
     .order("created_at", { ascending: false })
     .limit(limit);
 

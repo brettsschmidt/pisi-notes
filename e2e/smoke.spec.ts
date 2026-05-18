@@ -36,6 +36,27 @@ test("/tasks bounces to /login when signed out", async ({ page }) => {
   await expect(page).toHaveURL(/\/login$/);
 });
 
+test("/calendar bounces to /login when signed out", async ({ page }) => {
+  await page.goto("/calendar");
+  await expect(page).toHaveURL(/\/login$/);
+});
+
+test("/settings bounces to /login when signed out", async ({ page }) => {
+  await page.goto("/settings");
+  await expect(page).toHaveURL(/\/login$/);
+});
+
+test("manifest + service worker are served for PWA install", async ({ request }) => {
+  const manifest = await request.get("/manifest.webmanifest");
+  expect(manifest.status()).toBe(200);
+  const manifestJson = await manifest.json();
+  expect(manifestJson.name).toBeTruthy();
+  expect(Array.isArray(manifestJson.icons)).toBe(true);
+
+  const sw = await request.get("/sw.js");
+  expect(sw.status()).toBe(200);
+});
+
 test("invalid credentials show a friendly error", async ({ page }) => {
   await page.goto("/login");
   await page.locator('input[name="email"]').first().fill("nobody-real@test.local");
@@ -46,7 +67,7 @@ test("invalid credentials show a friendly error", async ({ page }) => {
 });
 
 test("no page returns 5xx on the unauthed surface", async ({ request }) => {
-  for (const path of ["/", "/login", "/signup", "/notes", "/tasks"]) {
+  for (const path of ["/", "/login", "/signup", "/notes", "/tasks", "/calendar", "/settings"]) {
     const r = await request.get(path);
     expect(r.status(), `unexpected status for ${path}`).toBeLessThan(500);
   }

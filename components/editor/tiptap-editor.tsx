@@ -7,7 +7,7 @@ import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
 import { Markdown } from "tiptap-markdown";
-import { useEffect, useImperativeHandle, forwardRef } from "react";
+import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
 import { HashtagExtension } from "./hashtag-extension";
 import { DoColonExtension } from "./do-colon-extension";
 import { ReminderShortcutExtension } from "./reminder-shortcut-extension";
@@ -25,12 +25,14 @@ export interface TiptapEditorProps {
   initialMarkdown?: string;
   placeholder?: string;
   onSubmit?: (md: string) => void;
+  /** Fires on every document change with the current markdown. */
+  onChange?: (md: string) => void;
   className?: string;
   ariaLabel?: string;
 }
 
 export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function TiptapEditor(
-  { initialMarkdown = "", placeholder = "Write a note… `do:` for a task, `monday:` or `5/25:` for a reminder, #hashtags work too.", onSubmit, className, ariaLabel },
+  { initialMarkdown = "", placeholder = "Write a note… `do:` for a task, `monday:` or `5/25:` for a reminder, #hashtags work too.", onSubmit, onChange, className, ariaLabel },
   ref,
 ) {
   const editor = useEditor({
@@ -54,6 +56,9 @@ export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function
       RemindTokenDecoration,
     ],
     content: initialMarkdown ? { type: "doc", content: [] } : "",
+    onUpdate({ editor: e }) {
+      onChangeRef.current?.(e.storage.markdown.getMarkdown());
+    },
     editorProps: {
       attributes: {
         class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[2.5rem]",
@@ -127,6 +132,13 @@ export const TiptapEditor = forwardRef<TiptapHandle, TiptapEditorProps>(function
     editorRef.current = editor;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
+
+  // Keep onChange in a ref so the editor's onUpdate closure always calls the
+  // latest callback without needing to re-create the editor.
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     if (editor && initialMarkdown) {

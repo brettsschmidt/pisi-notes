@@ -185,6 +185,17 @@ export async function unarchiveNote(id: string) {
   revalidatePath("/tasks");
 }
 
+export async function setNotePinned(id: string, pinned: boolean) {
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase
+    .from("notes")
+    .update({ pinned_at: pinned ? new Date().toISOString() : null })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/notes");
+}
+
 // Append a reminder to an existing note. The reminder body is derived from
 // the note's first prose line so the user gets a sensible label without
 // being prompted for it; they can edit the line later via the note editor.

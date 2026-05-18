@@ -22,20 +22,24 @@ function applyTheme(theme: Theme) {
   root.classList.toggle("dark", dark);
 }
 
+function readStoredTheme(): Theme {
+  if (typeof window === "undefined") return "system";
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("system");
+  // Lazy initializer reads localStorage once — no setState-in-effect needed.
+  const [theme, setTheme] = useState<Theme>(readStoredTheme);
 
   useEffect(() => {
-    const saved = (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? "system";
-    setTheme(saved);
-
-    if (saved !== "system") return;
+    if (theme !== "system") return;
     // While in system mode, follow the OS preference live.
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => applyTheme("system");
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, []);
+  }, [theme]);
 
   function set(next: Theme) {
     localStorage.setItem(STORAGE_KEY, next);

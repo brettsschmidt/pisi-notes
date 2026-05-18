@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import {
   addDays,
   addHours,
@@ -76,16 +76,18 @@ export function ReminderPicker({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const seed = initialIso ? new Date(initialIso) : addHours(startOfHour(new Date()), 1);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDate(seed);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTime(format(seed, "HH:mm"));
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setError(null);
-  }, [open, initialIso]);
+  // Re-seed the inputs each time the dialog (re)opens. Uses the
+  // "adjust state during render" pattern so there's no extra render pass.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      const seed = initialIso ? new Date(initialIso) : addHours(startOfHour(new Date()), 1);
+      setDate(seed);
+      setTime(format(seed, "HH:mm"));
+      setError(null);
+    }
+  }
 
   const composed = useMemo(() => {
     if (!date) return null;

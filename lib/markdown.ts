@@ -63,7 +63,7 @@ export function splitMarkdown(md: string): {
   };
 }
 
-export async function renderProseHtml(md: string): Promise<string> {
+export async function renderProseHtml(md: string, highlight?: string): Promise<string> {
   if (!md.trim()) return "";
   const file = await processor.process(md);
   let html = String(file);
@@ -74,5 +74,26 @@ export async function renderProseHtml(md: string): Promise<string> {
   html = html.replace(HASHTAG_HTML_RE, (_full, prefix: string, tag: string) => {
     return `${prefix}<span class="pisi-hashtag">#${tag}</span>`;
   });
+  // Highlight the active search term so a result shows *why* it matched.
+  if (highlight && highlight.trim()) {
+    html = highlightHtml(html, highlight.trim());
+  }
   return html;
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Wrap occurrences of `term` in <mark>, but only inside text content — never
+ * inside tags or attributes. We walk the string tag-by-tag so a search for
+ * e.g. "span" can't corrupt the markup.
+ */
+function highlightHtml(html: string, term: string): string {
+  const re = new RegExp(`(${escapeRegExp(term)})`, "gi");
+  return html.replace(/(<[^>]+>)|([^<]+)/g, (_full, tag: string | undefined, text: string | undefined) => {
+    if (tag) return tag;
+    return (text ?? "").replace(re, '<mark class="pisi-search-hit">$1</mark>');
+  });
 }

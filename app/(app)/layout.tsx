@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { Mascot } from "@/components/mascot/mascot";
+import { MascotMount } from "@/components/mascot/mascot-mount";
+import { KeyboardShortcuts } from "@/components/nav/keyboard-shortcuts";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -11,7 +12,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       {children}
-      <Mascot greetOnMount />
+      <KeyboardShortcuts />
+      <MascotMount />
     </>
   );
 }

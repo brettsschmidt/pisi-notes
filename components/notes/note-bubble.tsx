@@ -1,5 +1,5 @@
 import { format, formatDistanceToNow } from "date-fns";
-import { AlarmClock, Archive, ListChecks } from "lucide-react";
+import { AlarmClock, Archive, ListChecks, Pin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { renderProseHtml, splitMarkdown } from "@/lib/markdown";
 import { InlineTask } from "@/components/tasks/inline-task";
@@ -14,6 +14,9 @@ interface NoteBubbleProps {
   content_md: string;
   created_at: string;
   archived_at?: string | null;
+  pinned_at?: string | null;
+  /** Active search term — matches get highlighted in the rendered prose. */
+  highlight?: string;
   tasks: TaskRow[];
   reminders: ReminderRow[];
 }
@@ -23,14 +26,17 @@ export async function NoteBubble({
   content_md,
   created_at,
   archived_at,
+  pinned_at,
+  highlight,
   tasks,
   reminders,
 }: NoteBubbleProps) {
   const { prose } = splitMarkdown(content_md);
-  const proseHtml = await renderProseHtml(prose);
+  const proseHtml = await renderProseHtml(prose, highlight);
   const sortedTasks = tasks.slice().sort((a, b) => a.position - b.position);
   const sortedReminders = reminders.slice().sort((a, b) => a.position - b.position);
   const archived = !!archived_at;
+  const pinned = !!pinned_at;
   const openReminders = sortedReminders.filter((r) => !r.done).length;
 
   return (
@@ -39,6 +45,7 @@ export async function NoteBubble({
       className={cn(
         "pisi-bubble target:ring-2 target:ring-primary target:ring-offset-2",
         archived && "opacity-75 ring-1 ring-muted-foreground/20",
+        pinned && "ring-1 ring-primary/30",
       )}
     >
       <header className="mb-2 flex items-center justify-between gap-2 text-xs text-muted-foreground">
@@ -46,6 +53,12 @@ export async function NoteBubble({
           <time dateTime={created_at} title={format(new Date(created_at), "PPpp")}>
             {formatDistanceToNow(new Date(created_at), { addSuffix: true })}
           </time>
+          {pinned && (
+            <Badge variant="outline" className="gap-1 border-primary/40 text-primary">
+              <Pin className="h-3 w-3" />
+              pinned
+            </Badge>
+          )}
           {archived && (
             <Badge variant="outline" className="gap-1 border-dashed">
               <Archive className="h-3 w-3" />
@@ -66,7 +79,7 @@ export async function NoteBubble({
               <span>{openReminders}/{sortedReminders.length} reminder{sortedReminders.length === 1 ? "" : "s"}</span>
             </Badge>
           )}
-          <NoteActions noteId={id} initialMarkdown={content_md} archived={archived} />
+          <NoteActions noteId={id} initialMarkdown={content_md} archived={archived} pinned={pinned} />
         </div>
       </header>
       {proseHtml && (

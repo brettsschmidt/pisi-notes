@@ -22,7 +22,6 @@ function uniqueEmail(prefix = "user") {
 export const test = base.extend<AuthFixtures>({
   user: async ({}, use) => {
     if (!hasAdmin()) {
-      // eslint-disable-next-line playwright/no-skipped-test
       base.skip(true, "SUPABASE_SERVICE_ROLE_KEY not set — skipping auth-gated test");
     }
     const email = uniqueEmail();
