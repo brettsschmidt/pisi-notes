@@ -22,6 +22,7 @@
     "test:e2e:smoke": "playwright test smoke.spec.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
     "@hookform/resolvers": "^3.9.0",
     "@opennextjs/cloudflare": "^1.19.8",
     "@radix-ui/react-dialog": "^1.1.2",
@@ -54,6 +55,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.0",
     "sonner": "^1.5.0",
+    "stripe": "^22.1.1",
     "tailwind-merge": "^2.5.2",
     "tiptap-markdown": "^0.8.10",
     "unified": "^11.0.5",

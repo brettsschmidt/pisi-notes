@@ -14,6 +14,8 @@ export type Database = {
           created_at: string;
           id: string;
           pinned_at: string | null;
+          share_token: string | null;
+          shared_at: string | null;
           tags: string[];
           updated_at: string;
           user_id: string;
@@ -24,6 +26,8 @@ export type Database = {
           created_at?: string;
           id?: string;
           pinned_at?: string | null;
+          share_token?: string | null;
+          shared_at?: string | null;
           tags?: string[];
           updated_at?: string;
           user_id: string;
@@ -34,6 +38,8 @@ export type Database = {
           created_at?: string;
           id?: string;
           pinned_at?: string | null;
+          share_token?: string | null;
+          shared_at?: string | null;
           tags?: string[];
           updated_at?: string;
           user_id?: string;
@@ -190,6 +196,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      subscriptions: {
+        Row: {
+          user_id: string;
+          plan: string;
+          status: string;
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          current_period_end: string | null;
+          cancel_at_period_end: boolean;
+          ai_credits_used: number;
+          last_digest_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          plan?: string;
+          status?: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          ai_credits_used?: number;
+          last_digest_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          plan?: string;
+          status?: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+          ai_credits_used?: number;
+          last_digest_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -234,6 +282,19 @@ export type Database = {
           updated_at: string;
           user_id: string;
         };
+      };
+      consume_ai_credit: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      get_shared_note: {
+        Args: { p_token: string };
+        Returns: {
+          id: string;
+          content_md: string;
+          tags: string[];
+          created_at: string;
+        }[];
       };
     };
     Enums: {

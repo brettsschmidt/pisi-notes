@@ -2,6 +2,8 @@
 
 Rich-text note-taking that travels as Markdown. Notes are written in a chat-style timeline with the latest at the bottom, hashtags auto-build categories, and any line written as `do: …` (or `- [ ] …`) becomes a tracked task that you can check off and link back to. Reminders, a calendar view, web-push notifications, dark mode, a draggable mascot, and a companion CLI round it out.
 
+**Ask Pisi** — an AI that has read your notes — answers questions and cites the notes it used; any note can be published as a read-only public link; a marketing landing page lives at `/`; and a Pro plan unlocks unlimited AI.
+
 A companion CLI (`pisi`) syncs your notes to a folder of `.md` files.
 
 The web app shares its Supabase project with [Baby-food](https://github.com/brettsschmidt/Baby-food) — its own tables live in a dedicated `pisi` Postgres schema so the apps don't collide. Existing accounts work here.
@@ -13,6 +15,8 @@ The web app shares its Supabase project with [Baby-food](https://github.com/bret
 - Supabase (`@supabase/ssr`) — tables namespaced under the `pisi` schema
 - Tiptap with `tiptap-markdown`, task list, custom hashtag highlighter, custom `do:` / reminder input rules
 - `react-day-picker` for the calendar + reminder time picker
+- AI: Anthropic SDK (`@anthropic-ai/sdk`) — Ask Pisi, grounded in your notes
+- Billing: Stripe Checkout, customer portal, and webhooks
 - PWA: web manifest + service worker, Web Push for reminders
 - Deployed to Cloudflare Workers via OpenNext
 - CLI: Commander + prompts, bundled with tsup
@@ -25,9 +29,11 @@ npm install
 cp .env.example .env.local
 # fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
 #         SUPABASE_SERVICE_ROLE_KEY, SUPABASE_PROJECT_ID
+#         (ANTHROPIC_API_KEY and the STRIPE_* keys are optional — the app
+#          runs fine without them; see Ask Pisi and Plans & billing below)
 ```
 
-Apply the migrations in `supabase/migrations/` in order (Supabase SQL Editor or `supabase db push`). They create the `pisi` schema and its tables — `notes`, `tasks`, `reminders`, `push_subscriptions`, `user_prefs` — all with row-level security scoped to the signed-in user.
+Apply the migrations in `supabase/migrations/` in order (Supabase SQL Editor or `supabase db push`). They create the `pisi` schema and its tables — `notes`, `tasks`, `reminders`, `push_subscriptions`, `user_prefs`, `subscriptions` — all with row-level security scoped to the signed-in user.
 
 Then regenerate types:
 
@@ -110,6 +116,27 @@ Internally a stable id is encoded in the Markdown as an HTML comment that is inv
 ```
 - [x] <!--task:9f3c…--> ship the PR
 ```
+
+## Ask Pisi (AI)
+
+`/ask` — ask a question in plain English and Pisi answers from your own notes, citing the exact notes each answer drew from. The whole note corpus is sent as a cached prompt prefix, so follow-up questions within a session are cheap.
+
+- Free accounts get 10 questions to try it; Pro is unlimited. Usage is metered atomically by the `pisi.consume_ai_credit()` database function.
+- Requires `ANTHROPIC_API_KEY`. Without it, `/ask` shows a friendly "not enabled" state — nothing else breaks.
+- The model defaults to `claude-opus-4-7`; override with `ANTHROPIC_MODEL`.
+
+Every note's `⋯` menu also has **Ask Pisi** — one-tap summarize or action-item extraction, and the extracted items can be appended to the note as `do:` tasks. And `/api/ai/digest`, hit weekly by the same cron as the reminder dispatcher, pushes Pro subscribers a short AI digest of the week's notes — the proactive retention loop. It self-throttles to one digest per subscriber per week (`pisi.subscriptions.last_digest_at`).
+
+## Sharing
+
+Every note's `⋯` menu has **Share** — it mints an unguessable token, and the note becomes readable at `/n/<token>` by anyone with the link, no account needed. The public page carries a "start your own" call to action. **Stop sharing** revokes the link. Shared notes are read through a `security definer` function, so the page works for signed-out visitors without exposing anything else in the table.
+
+## Plans & billing
+
+- **Free** — the entire notebook: unlimited notes, tasks, reminders, the calendar, search, the CLI, dark mode, PWA install, public sharing, and 10 Ask Pisi questions.
+- **Pro** — $8/month or $72/year — unlimited Ask Pisi.
+
+`/` is a marketing landing page for signed-out visitors, `/pricing` lays out the plans, and **Settings → Plan & billing** shows the current plan and AI usage. Upgrades run through Stripe Checkout (`lib/actions/billing.ts`); the `/api/billing/webhook` route keeps `pisi.subscriptions` in sync. Billing is optional — without the `STRIPE_*` env vars the app runs entirely on the free plan and the upgrade button is disabled.
 
 ## CLI: `pisi`
 

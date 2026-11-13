@@ -344,3 +344,15 @@ body {
 .ProseMirror ul[data-type="taskList"] li > div {
   flex: 1;
 }
+
+/* Animated ellipsis for the "Pisi is reading your notes…" thinking state. */
+.pisi-ellipsis::after {
+  content: "";
+  animation: pisi-ellipsis 1.4s steps(1, end) infinite;
+}
+@keyframes pisi-ellipsis {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75%, 100% { content: "…"; }
+}

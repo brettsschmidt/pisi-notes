@@ -10,6 +10,7 @@ export interface NoteRow {
   updated_at: string;
   archived_at: string | null;
   pinned_at: string | null;
+  share_token: string | null;
 }
 
 export interface NoteFilters {
@@ -25,7 +26,7 @@ export async function getRecentNotes(filters: NoteFilters = {}): Promise<NoteRow
   const limit = filters.limit ?? 200;
   let q = supabase
     .from("notes")
-    .select("id, content_md, tags, created_at, updated_at, archived_at, pinned_at")
+    .select("id, content_md, tags, created_at, updated_at, archived_at, pinned_at, share_token")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -98,4 +99,32 @@ export async function getOpenTaskCount(): Promise<number> {
     .select("id", { count: "exact", head: true })
     .eq("done", false);
   return count ?? 0;
+}
+
+export interface NoteForAi {
+  id: string;
+  content_md: string;
+  created_at: string;
+  tags: string[];
+}
+
+/**
+ * The user's notes, newest first, for grounding Ask Pisi answers. Capped so a
+ * very large archive can't blow the model's context window — the AI layer
+ * additionally trims to a character budget.
+ */
+export async function getNotesForAi(limit = 400): Promise<NoteForAi[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("notes")
+    .select("id, content_md, created_at, tags")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
 }

@@ -15,6 +15,8 @@
   // cron (Upstash QStash, GitHub Actions, etc.) with
   // `Authorization: Bearer ${PUSH_DISPATCH_SECRET}`. Cloudflare cron triggers
   // would need a scheduled() worker handler which opennextjs doesn't export.
+  // Weekly AI digest: hit /api/ai/digest once a week with the same Bearer
+  // secret — it self-throttles to one digest per subscriber per week.
   // Public, non-secret values. Mirrored in .env.production so `next build`
   // can inline them into the client bundle. Server secrets live in .dev.vars
   // (local) and Cloudflare dashboard secrets (prod) — never committed.

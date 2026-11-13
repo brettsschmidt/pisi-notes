@@ -15,6 +15,7 @@ interface NoteBubbleProps {
   created_at: string;
   archived_at?: string | null;
   pinned_at?: string | null;
+  share_token?: string | null;
   /** Active search term — matches get highlighted in the rendered prose. */
   highlight?: string;
   tasks: TaskRow[];
@@ -27,6 +28,7 @@ export async function NoteBubble({
   created_at,
   archived_at,
   pinned_at,
+  share_token,
   highlight,
   tasks,
   reminders,
@@ -79,7 +81,13 @@ export async function NoteBubble({
               <span>{openReminders}/{sortedReminders.length} reminder{sortedReminders.length === 1 ? "" : "s"}</span>
             </Badge>
           )}
-          <NoteActions noteId={id} initialMarkdown={content_md} archived={archived} pinned={pinned} />
+          <NoteActions
+            noteId={id}
+            initialMarkdown={content_md}
+            archived={archived}
+            pinned={pinned}
+            shareToken={share_token ?? null}
+          />
         </div>
       </header>
       {proseHtml && (

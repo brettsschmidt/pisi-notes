@@ -5,6 +5,7 @@ import { SearchBar } from "@/components/notes/search-bar";
 import { NoteTimeline } from "@/components/notes/note-timeline";
 import { NoteBubble } from "@/components/notes/note-bubble";
 import { NoteComposer } from "@/components/notes/note-composer";
+import { NotesWelcome } from "@/components/notes/notes-welcome";
 import { getRecentNotes, getTagCounts, getOpenTaskCount } from "@/lib/queries/notes";
 import { getTasksForNotes } from "@/lib/queries/tasks";
 import { getRemindersForNotes, getUpcomingReminderDates } from "@/lib/queries/reminders";
@@ -49,6 +50,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
         created_at={n.created_at}
         archived_at={n.archived_at}
         pinned_at={n.pinned_at}
+        share_token={n.share_token}
         highlight={search}
         tasks={tasksByNote.get(n.id) ?? []}
         reminders={remindersByNote.get(n.id) ?? []}
@@ -84,9 +86,7 @@ export default async function NotesPage({ searchParams }: PageProps) {
       )}
       <NoteTimeline scrollKey={`${timeline.length}-${pinned.length}`}>
         {notes.length === 0 ? (
-          <div className="my-auto rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            no notes yet — write your first one below
-          </div>
+          <NotesWelcome />
         ) : timeline.length === 0 ? (
           <div className="my-auto rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
             everything here is pinned — write another note below

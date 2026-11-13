@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTransition } from "react";
 import { format, parseISO } from "date-fns";
-import { AlarmClock, CalendarDays, Hash, ListChecks, Settings, X } from "lucide-react";
+import { AlarmClock, CalendarDays, Hash, ListChecks, Settings, Sparkles, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ interface TagSidebarProps {
   tags: TagCount[];
   activeTags: string[];
   openTaskCount: number;
-  view?: "notes" | "tasks" | "calendar";
+  view?: "notes" | "tasks" | "calendar" | "ask";
   reminders?: UpcomingReminderDate[];
   activeRemindDate?: string;
   showRemindersInSidebar?: boolean;
@@ -48,6 +48,7 @@ export function TagSidebar({
   const notesActive = view === "notes" && activeTags.length === 0 && !activeRemindDate;
   const tasksActive = view === "tasks";
   const calendarActive = view === "calendar";
+  const askActive = view === "ask";
 
   const hiddenTagMap = new Map(hiddenTags.map((h) => [h.tag, h.hiddenAt]));
   const hiddenDateMap = new Map(hiddenReminderDates.map((h) => [h.date, h.hiddenAt]));
@@ -99,6 +100,18 @@ export function TagSidebar({
         >
           <span className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" /> Calendar
+          </span>
+        </Link>
+        <Link
+          href="/ask"
+          aria-current={askActive ? "page" : undefined}
+          className={cn(
+            "flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-secondary",
+            askActive && "bg-secondary font-medium",
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" /> Ask Pisi
           </span>
         </Link>
       </nav>

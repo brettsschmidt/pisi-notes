@@ -63,6 +63,27 @@ export function splitMarkdown(md: string): {
   };
 }
 
+/**
+ * Clean a note's raw Markdown for public or AI rendering: drop pisi's internal
+ * task / reminder comment markers and inline `[@ISO]` time tokens, and rewrite
+ * reminder `( )` / `(x)` lines as standard `- [ ]` / `- [x]` task items so they
+ * render as checkboxes.
+ */
+export function stripNoteMarkers(md: string): string {
+  return md
+    .replace(/<!--task:[a-f0-9-]+-->/gi, "")
+    .replace(/<!--reminder:[a-f0-9-]+(?:@[^>]+)?-->/gi, "")
+    .replace(/\[@[^\]]*\]/g, "")
+    .replace(
+      /^(\s*)\(([ xX])\)\s+/gm,
+      (_m, indent: string, mark: string) =>
+        `${indent}- [${mark.toLowerCase() === "x" ? "x" : " "}] `,
+    )
+    .replace(/[ \t]+$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export async function renderProseHtml(md: string, highlight?: string): Promise<string> {
   if (!md.trim()) return "";
   const file = await processor.process(md);

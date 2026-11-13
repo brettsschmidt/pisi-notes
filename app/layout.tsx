@@ -2,14 +2,32 @@ import type { Metadata, Viewport } from "next";
 import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import "./globals.css";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://pisi-notes.brettsschmidt.workers.dev";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "pisi-notes",
-  description: "Rich text notes that travel as Markdown.",
+  description:
+    "A chat-style notebook that turns quick thoughts into tagged, searchable Markdown — with tasks, reminders, a calendar, and an AI that has read your notes.",
+  applicationName: "pisi-notes",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     title: "pisi",
     statusBarStyle: "black-translucent",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "pisi-notes",
+    title: "pisi-notes — write it like a text, keep it like Markdown",
+    description:
+      "A chat-style notebook with tasks, reminders, a calendar, and an AI that has read your notes.",
+  },
+  twitter: {
+    card: "summary",
+    title: "pisi-notes",
+    description: "Write it like a text. Keep it like Markdown.",
   },
   icons: {
     icon: [

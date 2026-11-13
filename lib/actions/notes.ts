@@ -241,3 +241,40 @@ export async function addReminderToNote(id: string, iso: string) {
   revalidatePath("/notes");
   revalidatePath("/tasks");
 }
+
+// Public sharing: a note with a share_token is readable by anyone with the
+// link, via the get_shared_note RPC. The token is a 128-bit random value, so
+// there is nothing to enumerate.
+export async function shareNote(id: string): Promise<{ token: string }> {
+  const { supabase, user } = await requireUser();
+
+  // Re-use an existing token so the link stays stable across re-shares.
+  const { data: existing } = await supabase
+    .from("notes")
+    .select("share_token")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
+  if (existing?.share_token) return { token: existing.share_token };
+
+  const token = crypto.randomUUID().replace(/-/g, "");
+  const { error } = await supabase
+    .from("notes")
+    .update({ share_token: token, shared_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/notes");
+  return { token };
+}
+
+export async function unshareNote(id: string): Promise<void> {
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase
+    .from("notes")
+    .update({ share_token: null, shared_at: null })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) throw error;
+  revalidatePath("/notes");
+}

@@ -1,7 +1,18 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { AlarmClock, Archive, ArchiveRestore, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
+import {
+  AlarmClock,
+  Archive,
+  ArchiveRestore,
+  MoreHorizontal,
+  Pencil,
+  Pin,
+  PinOff,
+  Share2,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +33,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TiptapEditor, type TiptapHandle } from "@/components/editor/tiptap-editor";
 import { ReminderPicker } from "@/components/tasks/reminder-picker";
+import { ShareDialog } from "@/components/notes/share-dialog";
+import { NoteAiDialog } from "@/components/ai/note-ai-dialog";
 import {
   addReminderToNote,
   archiveNote,
@@ -37,12 +50,21 @@ interface NoteActionsProps {
   initialMarkdown: string;
   archived: boolean;
   pinned: boolean;
+  shareToken: string | null;
 }
 
-export function NoteActions({ noteId, initialMarkdown, archived, pinned }: NoteActionsProps) {
+export function NoteActions({
+  noteId,
+  initialMarkdown,
+  archived,
+  pinned,
+  shareToken,
+}: NoteActionsProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const editorRef = useRef<TiptapHandle>(null);
 
@@ -113,6 +135,12 @@ export function NoteActions({ noteId, initialMarkdown, archived, pinned }: NoteA
           <DropdownMenuItem onSelect={() => setReminderOpen(true)}>
             <AlarmClock className="mr-2 h-4 w-4" /> Add reminder
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setShareOpen(true)}>
+            <Share2 className="mr-2 h-4 w-4" /> {shareToken ? "Share link" : "Share"}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setAiOpen(true)}>
+            <Sparkles className="mr-2 h-4 w-4" /> Ask Pisi
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={onPinToggle}>
             {pinned ? (
               <>
@@ -179,6 +207,20 @@ export function NoteActions({ noteId, initialMarkdown, archived, pinned }: NoteA
           await addReminderToNote(noteId, iso);
           speak("noteEdited");
         }}
+      />
+
+      <ShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        noteId={noteId}
+        initialToken={shareToken}
+      />
+
+      <NoteAiDialog
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        noteId={noteId}
+        noteMarkdown={initialMarkdown}
       />
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
