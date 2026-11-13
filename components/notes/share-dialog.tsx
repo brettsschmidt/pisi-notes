@@ -24,15 +24,26 @@ export function ShareDialog({ open, onOpenChange, noteId, initialToken }: ShareD
   const [token, setToken] = useState<string | null>(initialToken);
   const [pending, setPending] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [wasOpen, setWasOpen] = useState(open);
+
+  // Clear any stale error each time the dialog is reopened.
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setError(null);
+  }
 
   const url =
     token && typeof window !== "undefined" ? `${window.location.origin}/n/${token}` : "";
 
   async function createLink() {
     setPending(true);
+    setError(null);
     try {
       const res = await shareNote(noteId);
       setToken(res.token);
+    } catch {
+      setError("Couldn't create the link. Please try again.");
     } finally {
       setPending(false);
     }
@@ -40,10 +51,14 @@ export function ShareDialog({ open, onOpenChange, noteId, initialToken }: ShareD
 
   async function stopSharing() {
     setPending(true);
+    setError(null);
     try {
       await unshareNote(noteId);
       setToken(null);
       setCopied(false);
+    } catch {
+      // Keep the token so the still-live link stays visible.
+      setError("Couldn't stop sharing. The link is still active — please try again.");
     } finally {
       setPending(false);
     }
@@ -107,6 +122,12 @@ export function ShareDialog({ open, onOpenChange, noteId, initialToken }: ShareD
           <Button type="button" onClick={createLink} disabled={pending}>
             <Globe className="h-4 w-4" /> {pending ? "Creating…" : "Create public link"}
           </Button>
+        )}
+
+        {error && (
+          <p role="alert" className="text-xs text-destructive">
+            {error}
+          </p>
         )}
       </DialogContent>
     </Dialog>
