@@ -95,3 +95,17 @@ test("no page returns 5xx on the unauthed surface", async ({ request }) => {
     expect(r.status(), `unexpected status for ${path}`).toBeLessThan(500);
   }
 });
+
+test("unknown route renders the branded not-found page", async ({ page }) => {
+  const res = await page.goto("/does-not-exist");
+  expect(res?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: /isn.t here/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /go home/i })).toHaveAttribute("href", "/");
+  await expect(page.getByRole("link", { name: /start your own/i })).toHaveAttribute("href", "/signup");
+});
+
+test("dead share link renders the branded not-found page", async ({ page }) => {
+  await page.goto("/n/0000000000000000");
+  await expect(page.getByRole("heading", { name: /isn.t here/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /start your own/i })).toHaveAttribute("href", "/signup");
+});
