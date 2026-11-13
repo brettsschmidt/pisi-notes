@@ -8,7 +8,7 @@ const config = [
   ...nextWebVitals,
   ...nextTs,
   {
-    ignores: [".next/**", "dist/**", "node_modules/**", "public/**"],
+    ignores: [".next/**", "dist/**", "node_modules/**", "public/**", ".claude/**"],
   },
   {
     // Playwright fixtures expose a `use()` callback that ESLint's react-hooks

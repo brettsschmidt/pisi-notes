@@ -47,3 +47,7 @@ cloudflare-env.d.ts
 /test-results/
 /blob-report/
 /playwright/.cache/
+
+# software factory (runtime state + worktrees)
+/factory/state/
+/.claude/worktrees/

@@ -1,0 +1,40 @@
+{
+  "name": "pisi-notes factory",
+  "focus": "pisi-notes is a commercial notes SaaS (Next.js 16, Supabase, Stripe, Claude-powered Ask). Prefer work that makes the product more reliable, more polished, or more likely to convert and retain paying users. Small, finished changes beat ambitious unfinished ones.",
+  "target": {
+    "baseBranch": "main",
+    "branchPrefix": "factory/",
+    "worktreeDir": ".claude/worktrees"
+  },
+  "autonomy": {
+    "autoApproveLowRisk": true,
+    "autoMerge": true,
+    "maxItemsPerScout": 3,
+    "maxBacklog": 12,
+    "maxOpenChanges": 3,
+    "maxAttempts": 2,
+    "maxDiffLines": 600
+  },
+  "protectedPaths": [
+    ".env*",
+    ".claude/**",
+    "factory/**",
+    "supabase/migrations/**",
+    "lib/billing/**",
+    "app/api/billing/**",
+    "lib/actions/billing.ts",
+    "wrangler.jsonc",
+    "open-next.config.ts",
+    "package-lock.json"
+  ],
+  "extraChecks": [],
+  "schedule": {
+    "scout": "daily 8:00",
+    "builder": "daily 10:00, 15:00",
+    "reviewer": "daily 11:30, 16:30",
+    "auditor": "daily 18:00"
+  },
+  "dashboard": {
+    "port": 4319
+  }
+}
