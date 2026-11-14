@@ -75,14 +75,14 @@ export default async function NotesPage({ searchParams }: PageProps) {
       topbar={<SearchBar />}
     >
       {pinned.length > 0 && (
-        <div className="border-b border-border bg-secondary/30">
+        <section aria-label="pinned notes" className="border-b border-border bg-secondary/30">
           <div className="mx-auto max-h-[38dvh] w-full max-w-3xl overflow-y-auto p-4">
             <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
               <Pin className="h-3 w-3" /> pinned
             </div>
             <div className="flex flex-col gap-3">{pinned.map(bubble)}</div>
           </div>
-        </div>
+        </section>
       )}
       <NoteTimeline scrollKey={`${timeline.length}-${pinned.length}`}>
         {notes.length === 0 ? (
