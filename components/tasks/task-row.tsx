@@ -50,6 +50,7 @@ export function TaskRow({ task, prefill }: TaskRowProps) {
         onClick={onToggle}
         disabled={pending}
         aria-pressed={optimistic}
+        aria-label={optimistic ? `Mark "${task.text}" not done` : `Mark "${task.text}" done`}
         className={cn(
           "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border border-task-border bg-background transition-colors",
           optimistic && "bg-primary text-primary-foreground",
