@@ -13,9 +13,7 @@ export default async function SignupPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold">Create account</h1>
-      <p className="text-xs text-muted-foreground">
-        Same Supabase project as Baby-food — if you already have an account there, sign in instead.
-      </p>
+      <p className="text-sm text-muted-foreground">Start capturing notes in seconds.</p>
       {error && <p className="rounded-md bg-destructive/10 p-2 text-sm text-destructive">{error}</p>}
       <form action={signUpWithPassword} className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">

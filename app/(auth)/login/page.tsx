@@ -28,7 +28,14 @@ export default async function LoginPage({ searchParams }: PageProps) {
       <form action={signInWithMagicLink} className="flex flex-col gap-2">
         <p className="text-xs text-muted-foreground">Or get a magic link:</p>
         <div className="flex gap-2">
-          <Input name="email" type="email" placeholder="you@example.com" required />
+          <Input
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            autoComplete="email"
+            aria-label="Email for magic link"
+          />
           <Button type="submit" variant="outline">Send link</Button>
         </div>
       </form>

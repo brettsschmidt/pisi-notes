@@ -37,6 +37,23 @@ test("signup page renders the create-account form", async ({ page }) => {
   await expect(page.locator('input[name="password"]')).toBeVisible();
 });
 
+test("signup page has no internal implementation notes", async ({ page }) => {
+  await page.goto("/signup");
+  await expect(page.getByText(/baby-food|supabase/i)).toHaveCount(0);
+});
+
+test("magic-link email field has an accessible name", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.getByRole("textbox", { name: "Email for magic link" })).toBeVisible();
+});
+
+test("verify page links back to sign in", async ({ page }) => {
+  await page.goto("/verify");
+  await expect(page.getByRole("heading", { name: /check your email/i })).toBeVisible();
+  await page.getByRole("link", { name: /back to sign in/i }).click();
+  await expect(page).toHaveURL(/\/login$/);
+});
+
 test("login → signup nav link works", async ({ page }) => {
   await page.goto("/login");
   await page.getByRole("link", { name: /sign up/i }).click();
