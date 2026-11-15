@@ -29,3 +29,30 @@ test("tasks page tab labels show counts", async ({ signedIn, user }) => {
   await expect(signedIn.getByRole("tab", { name: /open \(\d+\)/i })).toContainText("(2)");
   await expect(signedIn.getByRole("tab", { name: /done \(\d+\)/i })).toContainText("(1)");
 });
+
+test("checking off an open task moves it to the Done tab", async ({ signedIn, user }) => {
+  const noteId = await seedNote(user.id, "check-off note", []);
+  const text = `check-me-${Date.now()}`;
+  await seedTask(user.id, noteId, text, false);
+
+  await signedIn.goto("/tasks");
+  const toggle = signedIn.getByRole("button", { name: `Mark "${text}" done`, exact: true });
+  await expect(toggle).toBeVisible();
+  await toggle.click();
+
+  // The optimistic state flips the label before the server round-trip finishes.
+  await expect(
+    signedIn.getByRole("button", { name: `Mark "${text}" not done`, exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+
+  // After the server action revalidates, the task belongs to the Done tab.
+  await expect(async () => {
+    await signedIn.reload();
+    await expect(signedIn.getByText(text)).toHaveCount(0);
+  }).toPass();
+
+  await signedIn.getByRole("tab", { name: /^done/i }).click();
+  await expect(
+    signedIn.getByRole("button", { name: `Mark "${text}" not done`, exact: true }),
+  ).toBeVisible();
+});
