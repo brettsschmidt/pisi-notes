@@ -4,9 +4,9 @@ import { Landing } from "@/components/marketing/landing";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "pisi-notes — write it like a text, keep it like Markdown",
+  title: "Minmi Email Helper: a new image on every email open",
   description:
-    "A chat-style notebook that turns quick thoughts into tagged, searchable Markdown — with tasks, reminders, a calendar, and an AI that has read every note you've written.",
+    "Put one image URL in your email and show a different picture each time it's opened. Upload a set of images, choose in-order or random, and paste the link into any email tool.",
 };
 
 export default async function HomePage() {
@@ -14,8 +14,8 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  // Signed-in visitors go straight to their notes; everyone else gets the
+  // Signed-in visitors go straight to their links; everyone else gets the
   // marketing landing page.
-  if (user) redirect("/notes");
+  if (user) redirect("/rotators");
   return <Landing />;
 }

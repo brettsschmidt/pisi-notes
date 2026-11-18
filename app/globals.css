@@ -12,14 +12,14 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 250);
 
-  --primary: oklch(0.55 0.18 280);
+  --primary: oklch(0.55 0.11 170);
   --primary-foreground: oklch(0.99 0 0);
 
-  --secondary: oklch(0.96 0.01 280);
-  --secondary-foreground: oklch(0.22 0.04 280);
+  --secondary: oklch(0.96 0.01 170);
+  --secondary-foreground: oklch(0.22 0.04 170);
 
-  --muted: oklch(0.96 0.005 280);
-  --muted-foreground: oklch(0.5 0.02 280);
+  --muted: oklch(0.96 0.005 170);
+  --muted-foreground: oklch(0.5 0.02 170);
 
   --accent: oklch(0.94 0.04 90);
   --accent-foreground: oklch(0.25 0.04 90);
@@ -27,13 +27,12 @@
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.9 0.01 280);
-  --input: oklch(0.93 0.01 280);
-  --ring: oklch(0.55 0.18 280);
+  --border: oklch(0.9 0.01 170);
+  --input: oklch(0.93 0.01 170);
+  --ring: oklch(0.55 0.11 170);
 
-  /* Spooky-cat purple — moonlit lavender in light mode. */
-  --task-tint: oklch(0.95 0.04 295);
-  --task-border: oklch(0.78 0.12 295);
+  --task-tint: oklch(0.95 0.04 170);
+  --task-border: oklch(0.78 0.12 170);
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -42,23 +41,23 @@
 }
 
 .dark {
-  --background: oklch(0.16 0.02 280);
+  --background: oklch(0.16 0.02 170);
   --foreground: oklch(0.97 0 0);
 
-  --card: oklch(0.2 0.02 280);
+  --card: oklch(0.2 0.02 170);
   --card-foreground: oklch(0.97 0 0);
 
-  --popover: oklch(0.2 0.02 280);
+  --popover: oklch(0.2 0.02 170);
   --popover-foreground: oklch(0.97 0 0);
 
-  --primary: oklch(0.7 0.16 280);
-  --primary-foreground: oklch(0.16 0.02 280);
+  --primary: oklch(0.72 0.12 170);
+  --primary-foreground: oklch(0.16 0.02 170);
 
-  --secondary: oklch(0.26 0.03 280);
+  --secondary: oklch(0.26 0.03 170);
   --secondary-foreground: oklch(0.95 0 0);
 
-  --muted: oklch(0.24 0.02 280);
-  --muted-foreground: oklch(0.7 0.02 280);
+  --muted: oklch(0.24 0.02 170);
+  --muted-foreground: oklch(0.7 0.02 170);
 
   --accent: oklch(0.32 0.05 90);
   --accent-foreground: oklch(0.95 0.04 90);
@@ -66,13 +65,12 @@
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.3 0.02 280);
-  --input: oklch(0.28 0.02 280);
-  --ring: oklch(0.7 0.16 280);
+  --border: oklch(0.3 0.02 170);
+  --input: oklch(0.28 0.02 170);
+  --ring: oklch(0.72 0.12 170);
 
-  /* Witchy glow in dark mode — deep purple tint, brighter border. */
-  --task-tint: oklch(0.28 0.08 295);
-  --task-border: oklch(0.6 0.18 295);
+  --task-tint: oklch(0.28 0.08 170);
+  --task-border: oklch(0.6 0.18 170);
 }
 
 @theme inline {
@@ -122,237 +120,14 @@ body {
   padding-top: max(env(safe-area-inset-top), 0.75rem);
 }
 
-/* Hashtag mark styling */
-.pisi-hashtag {
-  color: var(--primary);
-  font-weight: 500;
-}
-
-/* Search-hit highlight inside rendered note prose. */
-.pisi-search-hit {
-  background-color: var(--accent);
-  color: var(--accent-foreground);
-  border-radius: 0.2rem;
-  padding: 0 0.1rem;
-}
-
-/* Reminder time tokens (`[@<ISO>]` inside the Tiptap editor): collapse the
-   raw chars entirely and render a friendly chip via a widget decoration in
-   their place. `display: none` is safe here because the chars round-trip
-   through tiptap-markdown via the document model, not the DOM. */
-.pisi-remind-token-raw {
-  display: none;
-}
-.pisi-remind-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.05rem 0.45rem;
-  margin: 0 0.15rem;
-  border-radius: 9999px;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font-size: 0.72rem;
-  font-weight: 500;
-  white-space: nowrap;
-  user-select: none;
-  vertical-align: baseline;
-}
-.pisi-remind-chip::before {
-  content: "⏰";
-  font-size: 0.7rem;
-  line-height: 1;
-}
-
-/* Link styling — used by task text and prose anchors. Clearly accent-coloured
-   and underlined so URLs stand out against body copy. */
-.pisi-link,
-.pisi-bubble a,
-.prose a {
-  color: var(--primary);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-  font-weight: 500;
-  word-break: break-word;
-  transition: color 120ms ease;
-}
-.pisi-link:hover,
-.pisi-bubble a:hover,
-.prose a:hover {
-  color: var(--accent-foreground);
-  text-decoration-thickness: 2px;
-}
-.dark .pisi-link,
-.dark .pisi-bubble a,
-.dark .prose a {
-  color: oklch(0.85 0.16 295);
-}
-
-/* Calendar day markers — small dot under the day number for any date that
-   has scheduled items. Lights up red when something is overdue. */
-.pisi-cal-day-scheduled > button {
-  position: relative;
-}
-.pisi-cal-day-scheduled > button::after {
-  content: "";
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  border-radius: 9999px;
-  background: var(--primary);
-}
-.pisi-cal-day-allDone > button::after {
-  content: "";
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  border-radius: 9999px;
-  background: var(--muted-foreground);
-  opacity: 0.5;
-}
-.pisi-cal-day-overdue > button::after {
-  background: var(--destructive);
-}
-
-/* Inline task highlight */
-.pisi-task-line {
-  background-color: var(--task-tint);
-  border: 1px solid var(--task-border);
-  border-radius: var(--radius-md);
-  padding: 0.375rem 0.625rem;
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
-  margin: 0.25rem 0;
-}
-
-/* Spooky frame behind Pisi the cat. Round vignette of moonlit purple,
-   with a small full-moon glow tucked behind the cat's shoulder. */
-.pisi-mascot-frame {
-  position: relative;
-  width: 5rem;
-  height: 5rem;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(
-    closest-side,
-    oklch(0.55 0.14 295 / 0.55),
-    oklch(0.35 0.12 295 / 0.45) 55%,
-    oklch(0.18 0.08 295 / 0.15) 80%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 18px oklch(0.55 0.18 295 / 0.45),
-    inset 0 0 12px oklch(0.25 0.1 295 / 0.5);
-}
-.dark .pisi-mascot-frame {
-  background: radial-gradient(
-    closest-side,
-    oklch(0.65 0.2 295 / 0.6),
-    oklch(0.4 0.16 295 / 0.6) 55%,
-    oklch(0.18 0.1 295 / 0.5) 85%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 22px oklch(0.7 0.22 295 / 0.55),
-    inset 0 0 14px oklch(0.3 0.12 295 / 0.7);
-}
-.pisi-mascot-haze {
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: radial-gradient(
-    ellipse at 30% 80%,
-    oklch(0.85 0.05 295 / 0.25),
-    transparent 60%
-  );
-  pointer-events: none;
-}
-.pisi-mascot-moon {
-  position: absolute;
-  top: 0.55rem;
-  right: 0.55rem;
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 9999px;
-  background: oklch(0.97 0.02 95);
-  box-shadow:
-    0 0 8px oklch(0.95 0.05 95 / 0.85),
-    0 0 18px oklch(0.95 0.08 95 / 0.55);
-  pointer-events: none;
-}
-.dark .pisi-mascot-moon {
-  background: oklch(0.93 0.03 95);
-  box-shadow:
-    0 0 10px oklch(0.92 0.07 95 / 0.9),
-    0 0 22px oklch(0.92 0.1 95 / 0.6);
-}
-/* Gentle breathing wobble for the cat sprite. The frame interval handles
-   "real" animation when sprites are present; this keeps her alive even on
-   the static fallback. */
-@keyframes pisi-breathe {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50%      { transform: translateY(-1px) scaleY(1.025); }
-}
-.pisi-mascot-cat {
-  animation: pisi-breathe 2.4s ease-in-out infinite;
-  transform-origin: center bottom;
-}
-
-/* Bubble for the timeline */
-.pisi-bubble {
+/* Checkerboard behind image thumbnails so transparent PNGs/GIFs read clearly. */
+.minmi-checker {
   background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem 1rem;
-}
-
-/* Tiptap editor base */
-.ProseMirror {
-  outline: none;
-  min-height: 2.5rem;
-}
-.ProseMirror p.is-editor-empty:first-child::before {
-  color: var(--muted-foreground);
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
-.ProseMirror ul[data-type="taskList"] {
-  list-style: none;
-  padding: 0;
-}
-.ProseMirror ul[data-type="taskList"] li {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
-}
-.ProseMirror ul[data-type="taskList"] li > label {
-  user-select: none;
-  margin-top: 0.125rem;
-}
-.ProseMirror ul[data-type="taskList"] li > div {
-  flex: 1;
-}
-
-/* Animated ellipsis for the "Pisi is reading your notes…" thinking state. */
-.pisi-ellipsis::after {
-  content: "";
-  animation: pisi-ellipsis 1.4s steps(1, end) infinite;
-}
-@keyframes pisi-ellipsis {
-  0% { content: ""; }
-  25% { content: "."; }
-  50% { content: ".."; }
-  75%, 100% { content: "…"; }
+  background-image:
+    linear-gradient(45deg, var(--muted) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--muted) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--muted) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--muted) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }

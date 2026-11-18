@@ -13,7 +13,7 @@ export async function signInWithPassword(formData: FormData): Promise<void> {
     redirect(`/login?error=${encodeURIComponent(friendlyAuthError(error.message))}`);
   }
   revalidatePath("/", "layout");
-  redirect("/notes");
+  redirect("/rotators");
 }
 
 export async function signInWithMagicLink(formData: FormData): Promise<void> {

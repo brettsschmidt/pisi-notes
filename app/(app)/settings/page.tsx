@@ -1,20 +1,22 @@
-import { AppShell } from "@/components/nav/app-shell";
-import { TagSidebar } from "@/components/notes/tag-sidebar";
-import { SettingsForm } from "@/components/settings/settings-form";
+import type { Metadata } from "next";
 import { BillingPanel } from "@/components/billing/billing-panel";
-import { getTagCounts, getOpenTaskCount } from "@/lib/queries/notes";
-import { getUpcomingReminderDates } from "@/lib/queries/reminders";
-import { getUserPrefs } from "@/lib/queries/prefs";
-import { getSubscription } from "@/lib/billing/subscription";
+import { SignedInShell } from "@/components/nav/signed-in-shell";
 import { entitlementsFor } from "@/lib/billing/plans";
 import { isStripeConfigured } from "@/lib/billing/stripe";
+import { getSubscription } from "@/lib/billing/subscription";
+import { countRotators } from "@/lib/queries/rotators";
+import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Settings · Minmi Email Helper" };
 
 function billingBanner(code: string | undefined): string | null {
   switch (code) {
     case "success":
-      return "Payment received — thanks for upgrading! If Pro isn’t showing yet, give it a moment to sync.";
+      return "Payment received. Thanks for upgrading! If Pro isn’t showing yet, give it a moment to sync.";
     case "already-pro":
       return "You’re already on the Pro plan.";
+    case "unavailable":
+      return "Billing management isn’t available on this deployment.";
     case "error":
       return "Something went wrong with billing. Please try again.";
     default:
@@ -30,34 +32,25 @@ export default async function SettingsPage({
   const { billing } = await searchParams;
   const banner = billingBanner(billing);
 
-  const [tagCounts, openTaskCount, upcomingReminders, prefs, subscription] =
-    await Promise.all([
-      getTagCounts(),
-      getOpenTaskCount(),
-      getUpcomingReminderDates(),
-      getUserPrefs(),
-      getSubscription(),
-    ]);
-  const entitlements = entitlementsFor(subscription);
+  const supabase = await createClient();
+  const [
+    {
+      data: { user },
+    },
+    subscription,
+    rotatorCount,
+  ] = await Promise.all([supabase.auth.getUser(), getSubscription(), countRotators()]);
 
   return (
-    <AppShell
-      sidebar={
-        <TagSidebar
-          tags={tagCounts}
-          activeTags={[]}
-          openTaskCount={openTaskCount}
-          reminders={upcomingReminders}
-          showRemindersInSidebar={prefs.showRemindersInSidebar}
-          hiddenTags={prefs.hiddenTags}
-          hiddenReminderDates={prefs.hiddenReminderDates}
-        />
-      }
-    >
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto p-4">
+    <SignedInShell>
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6">
         <header>
-          <h1 className="text-lg font-semibold">Settings</h1>
-          <p className="text-sm text-muted-foreground">Your stuff. Your way.</p>
+          <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
+          {user?.email && (
+            <p className="text-sm text-muted-foreground">
+              Signed in as <span className="font-medium text-foreground">{user.email}</span>
+            </p>
+          )}
         </header>
         {banner && (
           <p className="rounded-md border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
@@ -66,15 +59,11 @@ export default async function SettingsPage({
         )}
         <BillingPanel
           subscription={subscription}
-          entitlements={entitlements}
+          entitlements={entitlementsFor(subscription)}
           stripeConfigured={isStripeConfigured()}
-        />
-        <SettingsForm
-          showRemindersInSidebar={prefs.showRemindersInSidebar}
-          hiddenTags={prefs.hiddenTags}
-          hiddenReminderDates={prefs.hiddenReminderDates}
+          rotatorCount={rotatorCount}
         />
       </div>
-    </AppShell>
+    </SignedInShell>
   );
 }

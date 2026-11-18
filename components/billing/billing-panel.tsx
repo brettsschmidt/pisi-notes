@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openBillingPortal } from "@/lib/actions/billing";
 import {
-  FREE_AI_CREDITS,
+  LIMITS,
   PRO_PRICE_MONTHLY,
   type Entitlements,
   type Subscription,
@@ -15,11 +15,18 @@ interface BillingPanelProps {
   entitlements: Entitlements;
   /** Whether Stripe keys are present on this deployment. */
   stripeConfigured: boolean;
+  /** How many image links the user has, for the free-plan usage meter. */
+  rotatorCount: number;
 }
 
 /** The "Plan & billing" section of the Settings page. */
-export function BillingPanel({ subscription, entitlements, stripeConfigured }: BillingPanelProps) {
-  const { isPro, aiCreditsUsed } = entitlements;
+export function BillingPanel({
+  subscription,
+  entitlements,
+  stripeConfigured,
+  rotatorCount,
+}: BillingPanelProps) {
+  const { isPro } = entitlements;
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
@@ -41,7 +48,7 @@ export function BillingPanel({ subscription, entitlements, stripeConfigured }: B
       {isPro ? (
         <ProDetails subscription={subscription} stripeConfigured={stripeConfigured} />
       ) : (
-        <FreeDetails used={aiCreditsUsed} />
+        <FreeDetails used={rotatorCount} />
       )}
     </section>
   );
@@ -72,7 +79,7 @@ function ProDetails({
   return (
     <div className="mt-3 flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">
-        Thanks for going Pro 🖤 — unlimited Ask Pisi is on. {status}
+        Thanks for going Pro 💚 — unlimited image links are on. {status}
       </p>
       {stripeConfigured ? (
         <form action={openBillingPortal}>
@@ -90,32 +97,27 @@ function ProDetails({
 }
 
 function FreeDetails({ used }: { used: number }) {
-  const remaining = Math.max(0, FREE_AI_CREDITS - used);
-  const pct = Math.min(100, Math.round((used / FREE_AI_CREDITS) * 100));
+  const max = LIMITS.free.rotators;
+  const pct = Math.min(100, Math.round((used / max) * 100));
 
   return (
     <div className="mt-3 flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">
-        You’re on the free plan — the whole notebook, no limits. Pro adds
-        unlimited <span className="font-medium text-foreground">Ask Pisi</span>{" "}
-        AI for ${PRO_PRICE_MONTHLY}/month.
+        You’re on the free plan: {LIMITS.free.rotators} image links with up to{" "}
+        {LIMITS.free.imagesPerRotator} images each. Pro removes the link limit and allows{" "}
+        {LIMITS.pro.imagesPerRotator} images per link for ${PRO_PRICE_MONTHLY}/month.
       </p>
 
       <div>
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium">Ask Pisi free trial</span>
+          <span className="font-medium">Image links</span>
           <span className="tabular-nums text-muted-foreground">
-            {Math.min(used, FREE_AI_CREDITS)} / {FREE_AI_CREDITS} used
+            {Math.min(used, max)} / {max} used
           </span>
         </div>
         <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-secondary">
           <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
         </div>
-        <p className="mt-1.5 text-xs text-muted-foreground">
-          {remaining > 0
-            ? `${remaining} free question${remaining === 1 ? "" : "s"} left.`
-            : "You’ve used your free questions — upgrade for unlimited."}
-        </p>
       </div>
 
       <Button asChild size="sm" className="self-start">

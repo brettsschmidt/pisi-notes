@@ -5,11 +5,11 @@ import type { Database } from "@/types/supabase";
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient<Database, "pisi">(
+  return createServerClient<Database, "minmi">(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      db: { schema: "pisi" },
+      db: { schema: "minmi" },
       cookies: {
         getAll() {
           return cookieStore.getAll();

@@ -13,7 +13,7 @@ import {
 
 type Theme = "light" | "dark" | "system";
 
-const STORAGE_KEY = "pisi-theme";
+const STORAGE_KEY = "minmi-theme";
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;

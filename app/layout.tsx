@@ -1,45 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import "./globals.css";
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://pisi-notes.brettsschmidt.workers.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://minmi-email-helper.brettsschmidt.workers.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "pisi-notes",
+  title: "Minmi Email Helper",
   description:
-    "A chat-style notebook that turns quick thoughts into tagged, searchable Markdown — with tasks, reminders, a calendar, and an AI that has read your notes.",
-  applicationName: "pisi-notes",
+    "One image URL for your email that shows a different picture every time someone opens it. Upload a set of images, pick in-order or random, paste the link.",
+  applicationName: "Minmi Email Helper",
   manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    title: "pisi",
-    statusBarStyle: "black-translucent",
-  },
   openGraph: {
     type: "website",
-    siteName: "pisi-notes",
-    title: "pisi-notes — write it like a text, keep it like Markdown",
+    siteName: "Minmi Email Helper",
+    title: "Minmi Email Helper: a new image on every email open",
     description:
-      "A chat-style notebook with tasks, reminders, a calendar, and an AI that has read your notes.",
+      "One image URL for your email that shows a different picture every time someone opens it.",
   },
   twitter: {
     card: "summary",
-    title: "pisi-notes",
-    description: "Write it like a text. Keep it like Markdown.",
-  },
-  icons: {
-    icon: [
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
+    title: "Minmi Email Helper",
+    description: "A new image on every email open.",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#3a1d5a",
+  themeColor: "#0f8a74",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -47,7 +34,7 @@ export const viewport: Viewport = {
 
 // Inline so the dark class is applied before paint, avoiding a flash.
 const themeBootstrap = `
-(function(){try{var t=localStorage.getItem('pisi-theme')||'system';var d=t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){}})();
+(function(){try{var t=localStorage.getItem('minmi-theme')||'system';var d=t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){}})();
 `.trim();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -58,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
-        <RegisterServiceWorker />
       </body>
     </html>
   );

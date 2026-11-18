@@ -1,6 +1,6 @@
-// Plan catalog + entitlements for pisi-notes. Pure data and pure functions —
-// safe to import from client components (the pricing page, billing panel, and
-// upgrade nudges all render plan info directly).
+// Plan catalog + entitlements for Minmi Email Helper. Pure data and pure
+// functions — safe to import from client components (the pricing page,
+// billing panel, and upgrade nudges all render plan info directly).
 
 export type PlanId = "free" | "pro";
 
@@ -17,13 +17,14 @@ export interface Plan {
   features: string[];
 }
 
-/**
- * Lifetime "Ask Pisi" questions a free account gets before Pro is required.
- * The database meters usage atomically via pisi.consume_ai_credit() (see
- * migration 0003) — this constant is the single source of truth for the
- * limit itself, enforced in app code.
- */
-export const FREE_AI_CREDITS = 10;
+/** Plan limits. Enforced in app code (lib/actions/rotators.ts). */
+export const LIMITS: Record<PlanId, { rotators: number; imagesPerRotator: number }> = {
+  free: { rotators: 2, imagesPerRotator: 5 },
+  pro: { rotators: Number.POSITIVE_INFINITY, imagesPerRotator: 50 },
+};
+
+/** Max upload size per image, in bytes. Mirrors the storage bucket limit. */
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 /** Monthly price of Pro, used wherever a single headline number is needed. */
 export const PRO_PRICE_MONTHLY = 8;
@@ -32,29 +33,28 @@ export const PLANS: Record<PlanId, Plan> = {
   free: {
     id: "free",
     name: "Free",
-    tagline: "Everything you need to think in Markdown.",
+    tagline: "Try rotating images in your next send.",
     price: { monthly: 0, yearly: 0 },
     features: [
-      "Unlimited notes, tasks & reminders",
-      "Hashtag categories & instant search",
-      "Calendar view & web-push reminders",
-      "Install as an app — works offline (PWA)",
-      "Dark mode & the pisi CLI for local sync",
-      `${FREE_AI_CREDITS} Ask Pisi questions to try the AI`,
+      `${LIMITS.free.rotators} rotating image links`,
+      `Up to ${LIMITS.free.imagesPerRotator} images per link`,
+      "In-order or random rotation",
+      "Upload files or point at any https image",
+      "Open counts per link and per image",
+      "Works in any email tool that accepts an image URL",
     ],
   },
   pro: {
     id: "pro",
     name: "Pro",
-    tagline: "Your notes, with a brain.",
+    tagline: "For newsletters and campaigns that ship every week.",
     price: { monthly: PRO_PRICE_MONTHLY, yearly: 72 },
     features: [
       "Everything in Free",
-      "Unlimited Ask Pisi — chat with every note you've written",
-      "Answers cite the exact notes they came from",
-      "AI summaries & action-item extraction on any note",
-      "A weekly AI digest of your notes, pushed to your phone",
-      "Support a small indie app 🖤",
+      "Unlimited rotating image links",
+      `Up to ${LIMITS.pro.imagesPerRotator} images per link`,
+      "Priority support",
+      "Support a small indie app 💚",
     ],
   },
 };
@@ -79,7 +79,6 @@ export interface Subscription {
   status: SubscriptionStatus;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
-  aiCreditsUsed: number;
   stripeCustomerId: string | null;
 }
 
@@ -87,11 +86,8 @@ export interface Subscription {
 export interface Entitlements {
   plan: PlanId;
   isPro: boolean;
-  /** Free accounts: Ask Pisi questions left in the lifetime trial. Pro: Infinity. */
-  aiCreditsRemaining: number;
-  aiCreditsUsed: number;
-  /** Whether the user may send an Ask Pisi question right now. */
-  canUseAi: boolean;
+  maxRotators: number;
+  maxImagesPerRotator: number;
 }
 
 /** A Pro plan only counts while the subscription is actually in good standing. */
@@ -101,14 +97,11 @@ export function isProActive(sub: Pick<Subscription, "plan" | "status">): boolean
 
 export function entitlementsFor(sub: Subscription): Entitlements {
   const isPro = isProActive(sub);
-  const aiCreditsRemaining = isPro
-    ? Number.POSITIVE_INFINITY
-    : Math.max(0, FREE_AI_CREDITS - sub.aiCreditsUsed);
+  const limits = LIMITS[isPro ? "pro" : "free"];
   return {
     plan: sub.plan,
     isPro,
-    aiCreditsRemaining,
-    aiCreditsUsed: sub.aiCreditsUsed,
-    canUseAi: isPro || aiCreditsRemaining > 0,
+    maxRotators: limits.rotators,
+    maxImagesPerRotator: limits.imagesPerRotator,
   };
 }

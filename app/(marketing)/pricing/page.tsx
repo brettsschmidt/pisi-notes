@@ -2,35 +2,35 @@ import type { Metadata } from "next";
 import { UpgradeSection } from "@/components/billing/upgrade-section";
 import { isStripeConfigured } from "@/lib/billing/stripe";
 import { getEntitlements } from "@/lib/billing/subscription";
-import { PRO_PRICE_MONTHLY } from "@/lib/billing/plans";
+import { LIMITS, PRO_PRICE_MONTHLY } from "@/lib/billing/plans";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Pricing — pisi-notes",
+  title: "Pricing · Minmi Email Helper",
   description:
-    "pisi-notes is free forever for notes, tasks, reminders, the calendar, and the CLI. Pro adds unlimited Ask Pisi AI for $8/month.",
+    "Minmi Email Helper is free for your first rotating image links. Pro adds unlimited links and more images per link for $8/month.",
 };
 
 const FAQ: { q: string; a: string }[] = [
   {
-    q: "Is the note-taking app really free?",
-    a: "Yes — completely. Notes, tasks, reminders, the calendar, search, dark mode, offline/PWA install, and the pisi CLI are all free, forever. Pro only adds unlimited AI.",
+    q: "What does the free plan include?",
+    a: `${LIMITS.free.rotators} rotating image links with up to ${LIMITS.free.imagesPerRotator} images each, in-order or random rotation, uploads or linked images, and open counts. Free accounts don't expire.`,
   },
   {
-    q: "What counts as an Ask Pisi question?",
-    a: "Each question you send to the AI. Free accounts get 10 to try it out; Pro accounts are unlimited. Reading past answers never costs anything.",
+    q: "What counts as an open?",
+    a: "Each time a mail client loads the image URL. Some clients load images when the email arrives rather than when it's read (Apple Mail Privacy Protection does this), so counts are a close estimate, not an exact number of human views.",
+  },
+  {
+    q: "Will every reader see a different image?",
+    a: "In Gmail, Outlook, Yahoo, and most other clients, yes: Minmi tells them not to cache the image, so each open fetches the next one. Apple Mail with Privacy Protection fetches it once and keeps that copy.",
+  },
+  {
+    q: "What happens to sent emails if I downgrade?",
+    a: "Links you've already sent keep working. On the free plan you can't add new links past the free limit, and links over the image limit keep the images they already have.",
   },
   {
     q: "Can I cancel any time?",
-    a: "Any time, from Settings → Billing. You keep Pro until the end of the period you already paid for — no clawbacks, no hard feelings.",
-  },
-  {
-    q: "What happens to my notes if I downgrade?",
-    a: "Nothing at all. Every note is plain Markdown and always yours — the CLI can sync the lot to your own machine. Downgrading only turns off unlimited AI.",
-  },
-  {
-    q: "Monthly or yearly?",
-    a: "Whichever suits you — the features are identical. Paying yearly works out 25% cheaper.",
+    a: "Any time, from Settings. You keep Pro until the end of the period you've already paid for.",
   },
 ];
 
@@ -68,11 +68,12 @@ export default async function PricingPage({
           Pricing
         </p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-          Free to think. ${PRO_PRICE_MONTHLY} a month to remember.
+          Free to try. ${PRO_PRICE_MONTHLY} a month to scale.
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          The whole notebook is free, forever. Pro unlocks an AI that has read
-          every note you’ve written — cancel any time, straight from Settings.
+          Start with {LIMITS.free.rotators} free rotating image links. Pro removes the link
+          limit and allows up to {LIMITS.pro.imagesPerRotator} images per link. Cancel any
+          time from Settings.
         </p>
       </header>
 

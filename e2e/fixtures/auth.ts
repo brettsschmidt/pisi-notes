@@ -16,7 +16,7 @@ interface AuthFixtures {
 const PASSWORD = "Test123!password";
 
 function uniqueEmail(prefix = "user") {
-  return `e2e-pisi-${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.local`;
+  return `e2e-minmi-${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.local`;
 }
 
 export const test = base.extend<AuthFixtures>({
@@ -39,7 +39,7 @@ export const test = base.extend<AuthFixtures>({
     await page.locator('input[name="email"]').first().fill(user.email);
     await page.locator('input[name="password"]').fill(user.password);
     await page.getByRole("button", { name: /^sign in$/i }).click();
-    await page.waitForURL(/\/notes/, { timeout: 15_000 });
+    await page.waitForURL(/\/rotators/, { timeout: 15_000 });
     await use(page);
   },
 });

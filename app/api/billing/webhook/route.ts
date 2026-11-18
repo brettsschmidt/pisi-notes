@@ -32,7 +32,7 @@ function customerId(sub: Stripe.Subscription): string {
   return typeof sub.customer === "string" ? sub.customer : sub.customer.id;
 }
 
-/** Mirror a Stripe subscription into pisi.subscriptions. */
+/** Mirror a Stripe subscription into minmi.subscriptions. */
 async function syncSubscription(sub: Stripe.Subscription): Promise<void> {
   const userId = sub.metadata?.user_id;
   if (!userId) {

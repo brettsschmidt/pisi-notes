@@ -2,9 +2,22 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "minmi-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "-p",
+        "3005"
+      ],
+      "port": 3005
+    },
+    {
       "name": "factory-dashboard",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["factory/scripts/serve.mjs"],
+      "runtimeArgs": [
+        "factory/scripts/serve.mjs"
+      ],
       "port": 4319
     }
   ]

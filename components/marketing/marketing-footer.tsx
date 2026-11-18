@@ -1,12 +1,12 @@
-import Image from "next/image";
+import { MinmiMark } from "@/components/brand/minmi-mark";
 import Link from "next/link";
 
 const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] = [
   {
     heading: "Product",
     links: [
+      { href: "/#how-it-works", label: "How it works" },
       { href: "/#features", label: "Features" },
-      { href: "/#ask-pisi", label: "Ask Pisi" },
       { href: "/pricing", label: "Pricing" },
     ],
   },
@@ -15,14 +15,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] =
     links: [
       { href: "/signup", label: "Create an account" },
       { href: "/login", label: "Sign in" },
-      { href: "/notes", label: "Open the app" },
-    ],
-  },
-  {
-    heading: "More",
-    links: [
-      { href: "https://github.com/brettsschmidt/pisi-notes", label: "Source on GitHub" },
-      { href: "/#ask-pisi", label: "The pisi CLI" },
+      { href: "/rotators", label: "Open the app" },
     ],
   },
 ];
@@ -30,22 +23,15 @@ const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] =
 export function MarketingFooter() {
   return (
     <footer className="border-t border-border bg-secondary/30">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.6fr_1fr_1fr]">
         <div className="flex flex-col gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/mascot/cat-south.png"
-              alt=""
-              width={28}
-              height={28}
-              unoptimized
-              className="h-7 w-7 [image-rendering:pixelated]"
-            />
-            <span className="text-base font-semibold tracking-tight">pisi-notes</span>
+            <MinmiMark className="h-7 w-7" />
+            <span className="text-base font-semibold tracking-tight">Minmi Email Helper</span>
           </Link>
           <p className="max-w-xs text-sm text-muted-foreground">
-            A chat-style notebook that turns quick thoughts into tagged, searchable
-            Markdown — with an AI that has actually read your notes.
+            Rotating image links for email. One URL, a different image on every
+            open.
           </p>
         </div>
         {COLUMNS.map((col) => (
@@ -67,8 +53,8 @@ export function MarketingFooter() {
       </div>
       <div className="border-t border-border/70">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6">
-          <p>© {new Date().getFullYear()} pisi-notes · MIT licensed</p>
-          <p>Made with 🖤 and a spooky cat.</p>
+          <p>© {new Date().getFullYear()} Minmi Email Helper</p>
+          <p>Made with 💚 by a small indie team.</p>
         </div>
       </div>
     </footer>
