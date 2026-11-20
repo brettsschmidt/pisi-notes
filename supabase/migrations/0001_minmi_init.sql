@@ -1,4 +1,4 @@
--- Minmi Email Helper: initial schema.
+-- Quiet Upsell: initial schema.
 --
 -- Everything lives in its own `minmi` schema so it can share a Supabase
 -- project with other apps without colliding. After applying, add `minmi` to

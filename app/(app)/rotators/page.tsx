@@ -10,7 +10,7 @@ import { getEntitlements } from "@/lib/billing/subscription";
 import { listRotators } from "@/lib/queries/rotators";
 import { imageSrc, rotatorImageUrl } from "@/lib/rotators/urls";
 
-export const metadata: Metadata = { title: "Image links · Minmi Email Helper" };
+export const metadata: Metadata = { title: "Image links · Quiet Upsell" };
 
 function errorText(code: string | undefined, max: number): string | null {
   if (!code) return null;

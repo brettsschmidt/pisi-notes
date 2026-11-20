@@ -1,6 +1,6 @@
 {
-  "name": "minmi-email-helper factory",
-  "focus": "Minmi Email Helper is a commercial SaaS for rotating email images (Next.js 16, Supabase, Stripe): one image URL that serves a different image on each email open. Prefer work that makes the product more reliable, more polished, or more likely to convert and retain paying users. Small, finished changes beat ambitious unfinished ones.",
+  "name": "quiet-upsell factory",
+  "focus": "Quiet Upsell is a commercial SaaS for rotating email images (Next.js 16, Supabase, Stripe): one image URL that serves a different image on each email open. Prefer work that makes the product more reliable, more polished, or more likely to convert and retain paying users. Small, finished changes beat ambitious unfinished ones.",
   "target": {
     "baseBranch": "main",
     "branchPrefix": "factory/",

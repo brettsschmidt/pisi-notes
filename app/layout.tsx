@@ -2,25 +2,25 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://minmi-email-helper.brettsschmidt.workers.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://quiet-upsell.brettsschmidt.workers.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Minmi Email Helper",
+  title: "Quiet Upsell",
   description:
     "One image URL for your email that shows a different picture every time someone opens it. Upload a set of images, pick in-order or random, paste the link.",
-  applicationName: "Minmi Email Helper",
+  applicationName: "Quiet Upsell",
   manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",
-    siteName: "Minmi Email Helper",
-    title: "Minmi Email Helper: a new image on every email open",
+    siteName: "Quiet Upsell",
+    title: "Quiet Upsell: a new image on every email open",
     description:
       "One image URL for your email that shows a different picture every time someone opens it.",
   },
   twitter: {
     card: "summary",
-    title: "Minmi Email Helper",
+    title: "Quiet Upsell",
     description: "A new image on every email open.",
   },
 };

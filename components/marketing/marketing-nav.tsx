@@ -1,4 +1,4 @@
-import { MinmiMark } from "@/components/brand/minmi-mark";
+import { BrandMark } from "@/components/brand/brand-mark";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -16,9 +16,9 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur safe-top">
       <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2" aria-label="Minmi Email Helper home">
-          <MinmiMark className="h-7 w-7" />
-          <span className="text-base font-semibold tracking-tight">Minmi Email Helper</span>
+        <Link href="/" className="flex items-center gap-2" aria-label="Quiet Upsell home">
+          <BrandMark className="h-7 w-7" />
+          <span className="text-base font-semibold tracking-tight">Quiet Upsell</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -36,7 +36,7 @@ export function MarketingNav({ signedIn }: { signedIn: boolean }) {
         <div className="flex items-center gap-1.5">
           {signedIn ? (
             <Button asChild size="sm">
-              <Link href="/rotators">Open Minmi</Link>
+              <Link href="/rotators">Open Quiet Upsell</Link>
             </Button>
           ) : (
             <>

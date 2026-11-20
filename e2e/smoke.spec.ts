@@ -71,7 +71,7 @@ test("manifest is served", async ({ request }) => {
   const manifest = await request.get("/manifest.webmanifest");
   expect(manifest.status()).toBe(200);
   const manifestJson = await manifest.json();
-  expect(manifestJson.name).toBe("Minmi Email Helper");
+  expect(manifestJson.name).toBe("Quiet Upsell");
 });
 
 test("unknown image link serves an uncached transparent pixel, not an error", async ({ request }) => {

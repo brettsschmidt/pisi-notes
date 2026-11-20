@@ -36,7 +36,7 @@ export function getStripe(): Stripe | null {
   if (!cached) {
     cached = new Stripe(key, {
       httpClient: Stripe.createFetchHttpClient(),
-      appInfo: { name: "minmi-email-helper" },
+      appInfo: { name: "quiet-upsell" },
     });
   }
   return cached;

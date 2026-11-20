@@ -1,4 +1,4 @@
-// Plan catalog + entitlements for Minmi Email Helper. Pure data and pure
+// Plan catalog + entitlements for Quiet Upsell. Pure data and pure
 // functions — safe to import from client components (the pricing page,
 // billing panel, and upgrade nudges all render plan info directly).
 

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://minmi-email-helper.brettsschmidt.workers.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://quiet-upsell.brettsschmidt.workers.dev";
 
 export default function robots(): MetadataRoute.Robots {
   return {

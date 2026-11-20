@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Minmi Email Helper",
-    short_name: "Minmi",
+    name: "Quiet Upsell",
+    short_name: "Quiet Upsell",
     description: "A new image on every email open.",
     start_url: "/rotators",
     scope: "/",

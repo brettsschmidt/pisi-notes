@@ -7,7 +7,7 @@ import { getSubscription } from "@/lib/billing/subscription";
 import { countRotators } from "@/lib/queries/rotators";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Settings · Minmi Email Helper" };
+export const metadata: Metadata = { title: "Settings · Quiet Upsell" };
 
 function billingBanner(code: string | undefined): string | null {
   switch (code) {

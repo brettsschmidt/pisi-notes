@@ -1,4 +1,4 @@
-# Minmi Email Helper
+# Quiet Upsell
 
 Rotating image links for email. Create a link, load it with a set of images, and put its URL in an email's `<img src>`. Every time someone opens the email, the URL serves the next image — in order (1, 2, 3, back to 1) or at random.
 
@@ -78,7 +78,7 @@ npm run test:e2e     # authed specs need SUPABASE_SERVICE_ROLE_KEY
 ## Deploy
 
 ```bash
-npm run deploy       # opennextjs-cloudflare build + deploy (worker: minmi-email-helper)
+npm run deploy       # opennextjs-cloudflare build + deploy (worker: quiet-upsell)
 ```
 
 Set `SUPABASE_SERVICE_ROLE_KEY` and any Stripe secrets as Cloudflare secrets. Point the Stripe webhook at `<site>/api/billing/webhook`.

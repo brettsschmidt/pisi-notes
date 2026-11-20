@@ -39,7 +39,7 @@ export async function startCheckout(formData: FormData): Promise<void> {
       customer_email: user.email,
       client_reference_id: user.id,
       // Stamp the user id onto the subscription so the webhook can map the
-      // resulting Stripe subscription back to a Minmi account.
+      // resulting Stripe subscription back to a Quiet Upsell account.
       subscription_data: { metadata: { user_id: user.id } },
       metadata: { user_id: user.id },
       allow_promotion_codes: true,

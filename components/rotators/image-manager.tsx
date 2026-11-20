@@ -110,7 +110,7 @@ export function ImageManager({ rotatorId, userId, maxImages, isPro, nextIndex, i
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
+    <section className="relative flex flex-col gap-4 rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-sm font-medium">Images in rotation</h2>
         <span className="text-xs text-muted-foreground tabular-nums">

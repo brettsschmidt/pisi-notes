@@ -16,7 +16,7 @@ interface AuthFixtures {
 const PASSWORD = "Test123!password";
 
 function uniqueEmail(prefix = "user") {
-  return `e2e-minmi-${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.local`;
+  return `e2e-quiet-upsell-${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.local`;
 }
 
 export const test = base.extend<AuthFixtures>({

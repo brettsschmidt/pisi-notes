@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Home } from "lucide-react";
-import { MinmiMark } from "@/components/brand/minmi-mark";
+import { BrandMark } from "@/components/brand/brand-mark";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Not found · Minmi Email Helper",
+  title: "Not found · Quiet Upsell",
   robots: { index: false, follow: true },
 };
 
@@ -16,14 +16,14 @@ export default function NotFound() {
       <header className="border-b border-border bg-background/80 backdrop-blur safe-top">
         <div className="mx-auto flex h-14 w-full max-w-3xl items-center gap-4 px-4">
           <Link href="/" className="flex items-center gap-2">
-            <MinmiMark className="h-7 w-7" />
-            <span className="text-base font-semibold tracking-tight">Minmi Email Helper</span>
+            <BrandMark className="h-7 w-7" />
+            <span className="text-base font-semibold tracking-tight">Quiet Upsell</span>
           </Link>
         </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
-        <MinmiMark className="h-14 w-14 opacity-80" />
+        <BrandMark className="h-14 w-14 opacity-80" />
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">404</p>
           <h1 className="text-2xl font-bold tracking-tight">This page isn&apos;t here</h1>

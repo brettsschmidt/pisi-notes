@@ -6,9 +6,9 @@ import { LIMITS, PRO_PRICE_MONTHLY } from "@/lib/billing/plans";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Pricing · Minmi Email Helper",
+  title: "Pricing · Quiet Upsell",
   description:
-    "Minmi Email Helper is free for your first rotating image links. Pro adds unlimited links and more images per link for $8/month.",
+    "Quiet Upsell is free for your first rotating image links. Pro adds unlimited links and more images per link for $8/month.",
 };
 
 const FAQ: { q: string; a: string }[] = [
@@ -22,7 +22,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Will every reader see a different image?",
-    a: "In Gmail, Outlook, Yahoo, and most other clients, yes: Minmi tells them not to cache the image, so each open fetches the next one. Apple Mail with Privacy Protection fetches it once and keeps that copy.",
+    a: "In Gmail, Outlook, Yahoo, and most other clients, yes: Quiet Upsell tells them not to cache the image, so each open fetches the next one. Apple Mail with Privacy Protection fetches it once and keeps that copy.",
   },
   {
     q: "What happens to sent emails if I downgrade?",

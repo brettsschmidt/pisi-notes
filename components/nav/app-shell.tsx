@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MinmiMark } from "@/components/brand/minmi-mark";
+import { BrandMark } from "@/components/brand/brand-mark";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { signOut } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
@@ -47,8 +47,8 @@ export function AppShell({ sidebar, topbar, children }: AppShellProps) {
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <Link href="/rotators" className="flex items-center gap-2 text-base font-semibold tracking-tight">
-            <MinmiMark className="h-6 w-6" />
-            Minmi Email Helper
+            <BrandMark className="h-6 w-6" />
+            Quiet Upsell
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center gap-2 px-2">{topbar}</div>

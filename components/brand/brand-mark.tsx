@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
-/** The Minmi mark: two stacked image cards with a rotation arrow. */
-export function MinmiMark({ className }: { className?: string }) {
+/** The Quiet Upsell mark: two stacked image cards with a rotation arrow. */
+export function BrandMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={cn("shrink-0", className)}>
       <rect width="32" height="32" rx="8" className="fill-primary" />

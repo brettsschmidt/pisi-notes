@@ -11,7 +11,7 @@ import { getRotator } from "@/lib/queries/rotators";
 import { emailImgSnippet, imageSrc, rotatorImageUrl } from "@/lib/rotators/urls";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Image link · Minmi Email Helper" };
+export const metadata: Metadata = { title: "Image link · Quiet Upsell" };
 
 export default async function RotatorPage({
   params,

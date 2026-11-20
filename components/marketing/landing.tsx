@@ -11,7 +11,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MinmiMark } from "@/components/brand/minmi-mark";
+import { BrandMark } from "@/components/brand/brand-mark";
 import { PricingCards } from "@/components/marketing/pricing-cards";
 import { LIMITS } from "@/lib/billing/plans";
 import { rotatorImageUrl } from "@/lib/rotators/urls";
@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: Link2,
     title: "One URL, many images",
-    body: "Each link is a plain image URL. Put it in any email, and every open asks Minmi which image to show.",
+    body: "Each link is a plain image URL. Put it in any email, and every open asks Quiet Upsell which image to show.",
   },
   {
     icon: ListOrdered,
@@ -102,7 +102,7 @@ export function Landing() {
               </span>
             </h1>
             <p className="max-w-md text-lg text-muted-foreground">
-              Minmi Email Helper gives you an image URL to put in any email. Load it with a set of
+              Quiet Upsell gives you an image URL to put in any email. Load it with a set of
               images, and each time someone opens the email it shows the next one.
             </p>
             <div className="flex flex-wrap items-center gap-3">
@@ -131,7 +131,7 @@ export function Landing() {
           <SectionHeading
             eyebrow="How it works"
             title="Set it up in about a minute"
-            subtitle="No code and no plugins. If your email tool can show an image from a URL, it works with Minmi."
+            subtitle="No code and no plugins. If your email tool can show an image from a URL, it works with Quiet Upsell."
           />
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {STEPS.map((s, i) => (
@@ -229,7 +229,7 @@ export function Landing() {
                 "radial-gradient(50% 80% at 50% 100%, oklch(0.6 0.11 170 / 0.2), transparent 75%)",
             }}
           />
-          <MinmiMark className="mx-auto mb-6 h-14 w-14" />
+          <BrandMark className="mx-auto mb-6 h-14 w-14" />
           <h2 className="mx-auto max-w-xl text-3xl font-bold tracking-tight sm:text-4xl">
             Give your next email something new to show.
           </h2>

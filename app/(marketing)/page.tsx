@@ -4,7 +4,7 @@ import { Landing } from "@/components/marketing/landing";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Minmi Email Helper: a new image on every email open",
+  title: "Quiet Upsell: a new image on every email open",
   description:
     "Put one image URL in your email and show a different picture each time it's opened. Upload a set of images, choose in-order or random, and paste the link into any email tool.",
 };

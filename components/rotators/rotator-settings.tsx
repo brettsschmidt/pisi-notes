@@ -133,6 +133,7 @@ export function RotatorSettings({ id, name, mode, active, openCount, lastOpenedA
             type="button"
             role="radio"
             aria-checked={mode === opt.value}
+            aria-label={opt.label}
             title={opt.hint}
             disabled={pending}
             onClick={() => mode !== opt.value && run(() => updateRotator(id, { mode: opt.value }))}
