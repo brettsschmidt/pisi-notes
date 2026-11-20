@@ -69,7 +69,7 @@ const STEPS = [
 
 // Stand-ins for a user's images in the demo: gradient "photos" with a caption.
 const DEMO_IMAGES = [
-  { caption: "Tip #1", from: "oklch(0.72 0.13 170)", to: "oklch(0.55 0.12 210)" },
+  { caption: "Tip #1", from: "oklch(0.7 0.16 235)", to: "oklch(0.5 0.2 265)" },
   { caption: "Tip #2", from: "oklch(0.78 0.14 75)", to: "oklch(0.65 0.18 35)" },
   { caption: "Tip #3", from: "oklch(0.7 0.15 320)", to: "oklch(0.55 0.16 280)" },
 ];
@@ -84,7 +84,7 @@ export function Landing() {
           className="absolute inset-x-0 top-0 -z-10 h-[480px]"
           style={{
             background:
-              "radial-gradient(55% 60% at 50% 0%, oklch(0.6 0.11 170 / 0.22), transparent 72%)",
+              "radial-gradient(55% 60% at 50% 0%, oklch(0.6 0.19 255 / 0.24), transparent 72%)",
           }}
         />
         <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2">
@@ -97,7 +97,7 @@ export function Landing() {
               One image link.
               <br />
               A new picture{" "}
-              <span className="bg-gradient-to-r from-primary to-[oklch(0.65_0.13_220)] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary to-[oklch(0.55_0.16_225)] dark:to-[oklch(0.78_0.13_215)] bg-clip-text text-transparent">
                 every open.
               </span>
             </h1>
@@ -226,7 +226,7 @@ export function Landing() {
             className="absolute inset-0 -z-10"
             style={{
               background:
-                "radial-gradient(50% 80% at 50% 100%, oklch(0.6 0.11 170 / 0.2), transparent 75%)",
+                "radial-gradient(50% 80% at 50% 100%, oklch(0.6 0.19 255 / 0.22), transparent 75%)",
             }}
           />
           <BrandMark className="mx-auto mb-6 h-14 w-14" />
